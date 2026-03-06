@@ -1,6 +1,7 @@
 ﻿using LibraryManagementSystem.Context;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Model.BookDto;
+using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,35 +10,34 @@ namespace LibraryManagementSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : Controller
+    public class CategoryController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
-        public CategoryController(ApplicationDbContext DbContext)
+        private readonly ICategoryService _categoryContext;
+        public CategoryController(ICategoryService CategoryService)
         {
-            _dbContext = DbContext;
+            _categoryContext = CategoryService;
 
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCategory(Guid Id)
+        public async Task<IActionResult> GetAllCategory()
         {
-            var category = await _dbContext.Categories.ToListAsync();
-            if (category is null)
+            var categories = await _categoryContext.GetAllCategory();
+            if(!categories.Any())
             {
-                return NotFound();
+                return NotFound("No categories found");
             }
-            return Ok(category);
+            return Ok(categories);
+
         }
-
-
 
         [HttpGet]
         [Route("{Id:Guid}")]
-        public async Task<IActionResult> GetCategory(Guid Id)
+        public async Task<IActionResult> GetCategoryById(Guid Id)
         {
-            var category = await _dbContext.Categories.FindAsync(Id);
-            if (category is null)
+            var category = await _categoryContext.GetCategoryById(Id);
+            if(category is null)
             {
                 return NotFound();
             }
@@ -45,31 +45,16 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(CreateCategoryDto NewCat)
+        public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
         {
-            if (await _dbContext.Categories.AnyAsync(c => c.CategoryName == NewCat.CategoryName))
-            {
-                return BadRequest("Category already exists");
-            }
+            var category = await _categoryContext.CreateCategory(dto);
 
-            var CategoryEntity = new Category()
-            {
-                CategoryId = Guid.NewGuid(),
-                CategoryName = NewCat.CategoryName
-            };
-
-            await _dbContext.Categories.AddAsync(CategoryEntity);
-            int res = await _dbContext.SaveChangesAsync();
-
-            if(res > 0)
-            {
-                return Ok(CategoryEntity);
-            }
-            return BadRequest("Failed to create category");
-
+            return CreatedAtAction(nameof(GetCategoryById),
+                new { Id = category.CategoryId },
+                category);
         }
 
-       
+
     }
 }
 

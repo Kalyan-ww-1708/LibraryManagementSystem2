@@ -44,6 +44,17 @@ namespace LibraryManagementSystem.Controllers
             return Ok(category);
         }
 
+        [HttpGet]
+        [Route("cat/{name:string}")]
+        public async Task<IActionResult> GetCategoryByName(string name) { 
+            var categories = _categoryContext.GetCategoryByName(name);
+            if (categories is null)
+            {
+                return NotFound("Data Not Found");
+            }
+            return Ok(categories);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
         {

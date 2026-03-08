@@ -11,6 +11,7 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<Book?> DeleteBook(Guid Id);
         Task<Book?> IncrementAvailableBooks(Guid Id);
         Task<Book?> DecrementAvailableBooks(Guid Id);
+        Task<List<Book>?> GetBooksByCategory(Guid CategoryId);
 
     }
 }

@@ -28,7 +28,18 @@ namespace LibraryManagementSystem.Controllers
             return Ok(books);
         }
 
-        
+        [HttpGet]
+        [Route("cat/{categoryId:Guid}")]
+        public async Task<IActionResult> GetBooksByCategory(Guid categoryId) {
+
+            var books = await _bookService.GetBooksByCategory(categoryId);
+            if(books is null)
+            {
+                return NotFound("Books not available at this category");
+            }
+            return Ok(books);
+            
+        }
 
         //POST https://localhost:7033/api/book
         [HttpPost]

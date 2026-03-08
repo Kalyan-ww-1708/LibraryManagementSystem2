@@ -19,7 +19,7 @@ namespace LibraryManagementSystem.Services
             return await _dbContext.Categories.ToListAsync();
            
         }
-        public async Task<Category> GetCategoryById(Guid Id)
+        public async Task<Category?> GetCategoryById(Guid Id)
         {
             return await _dbContext.Categories.FindAsync(Id);
         }
@@ -30,6 +30,17 @@ namespace LibraryManagementSystem.Services
             await _dbContext.SaveChangesAsync();
             return category;
         }
+        public async Task<Category?> GetCategoryByName(string name)
+        {
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryName == name);
+
+            if(category == null)
+            {
+                return null;
+            }
+            return category;
+        }
+
      
     }
 }

@@ -109,6 +109,18 @@ namespace LibraryManagementSystem.Services
 
             return book;
         }
+
+        public async Task<List<Book>?> GetBooksByCategory(Guid categoryId)
+        {
+            var books = await _dbContext.Books.Where(b => b.CategoryId == categoryId).ToListAsync();
+            
+            if(books == null  || !books.Any())
+            {
+                return null;
+            }
+
+            return books;
+        }
             
         
     }

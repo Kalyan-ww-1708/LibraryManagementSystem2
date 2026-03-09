@@ -28,64 +28,93 @@ namespace LibraryManagementSystem.Controllers
             return Ok(books);
         }
 
+<<<<<<< Updated upstream
         
+=======
+        [HttpGet]
+        [Route("cat/{categoryId:guid}")]
+        public async Task<IActionResult> GetBooksByCategory(Guid categoryId) {
+
+            try
+            {
+                var books = await _bookService.GetBooksByCategory(categoryId);
+                return Ok(books);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }  
+        }
+>>>>>>> Stashed changes
 
         //POST https://localhost:7033/api/book
         [HttpPost]
         public async Task<IActionResult> CreateBook(CreateBookDto dto)
         {
-            var NewBook = await _bookService.CreateBook(dto);
-            return Ok(NewBook); 
+            try
+            {
+                var NewBook = await _bookService.CreateBook(dto);
+                return Ok(NewBook);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
         }
 
 
         [HttpPut]
-        [Route("{Id:guid}")]
-        public async Task<IActionResult> UpdateBook(Guid Id, UpdateBookDto dto)
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateBook(Guid id, UpdateBookDto dto)
         {
-            var updatedBook = await _bookService.UpdateBook(Id, dto);
-            if (updatedBook is null)
+            try{
+
+                var updatedBook = await _bookService.UpdateBook(id, dto);
+                return Ok(updatedBook);
+            }catch(Exception e)
             {
-                return NotFound("Data is Not Updated");
+                return BadRequest(e.Message);
             }
-            return Ok(updatedBook);
         }
 
         [HttpDelete]
-        [Route("{Id:guid}")]
-        public async Task<IActionResult> DeleteBook(Guid Id)
+        [Route("{id:guid}")]
+        public async Task<IActionResult> DeleteBook(Guid id)
         {
-            var book = await _bookService.DeleteBook(Id);
-            if(book is null)
-            {
-                return NotFound("Book Not found");
+            try{
+                var book = await _bookService.DeleteBook(id);
+                return Ok(book);
+            }catch(Exception e){
+                return BadRequest(e.Message);
             }
-            return Ok(book);
         }
         [HttpPatch]
-        [Route("less/{Id:Guid}")]
-        public async Task<IActionResult> IncrementBooks(Guid Id)
+        [Route("less/{id:guid}")]
+        public async Task<IActionResult> IncrementBooks(Guid id)
         {
-            var book = await _bookService.IncrementAvailableBooks(Id);
-            if (book is null)
-            {
-                return BadRequest("Request Failed");
-
+            try{
+                var book = await _bookService.IncrementAvailableBooks(id);
+                return Ok(book);
             }
-
-            return Ok(book);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPatch]
-        [Route("more/{Id:Guid}")]
-        public async Task<IActionResult> DecrementAvailableBooks(Guid Id)
+        [Route("more/{id:guid}")]
+        public async Task<IActionResult> DecrementAvailableBooks(Guid id)
         {
-            var book = await _bookService.DecrementAvailableBooks(Id);
-            if(book is null)
-            {
-                return BadRequest("Request Failed");
+            try {
+                var book = await _bookService.DecrementAvailableBooks(id);
+                return Ok(book);
             }
-            return Ok(book);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
         }
 
     }

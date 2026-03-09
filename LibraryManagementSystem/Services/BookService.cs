@@ -17,34 +17,36 @@ namespace LibraryManagementSystem.Services
 
         public async Task<List<Book>> GetAllBooks()
         {
+
             return await _dbContext.Books.ToListAsync();
         }
 
-        public async Task<Book> CreateBook(CreateBookDto NewBook)
+        public async Task<Book> CreateBook(CreateBookDto newBook)
         {
             var book = new Book()
             {
                 Id = Guid.NewGuid(),
-                BookTitle = NewBook.BookTitle,
-                Author = NewBook.Author,
-                Isbn = NewBook.Isbn,
-                Description = NewBook.Description,
-                AvailableCopies = NewBook.AvailableCopies,
-                TotalCopies = NewBook.TotalCopies,
+                BookTitle = newBook.BookTitle,
+                Author = newBook.Author,
+                Isbn = newBook.Isbn,
+                Description = newBook.Description,
+                AvailableCopies = newBook.AvailableCopies,
+                TotalCopies = newBook.TotalCopies,
             };
+            if(book == null)
+                throw new Exception("Unable to Create Book Please try Again");
             await _dbContext.Books.AddAsync(book);
             await _dbContext.SaveChangesAsync();
 
             return book;
-
         }
 
-        public async Task<Book?> UpdateBook(Guid Id, [FromBody] UpdateBookDto dto)
+        public async Task<Book?> UpdateBook(Guid id, [FromBody] UpdateBookDto dto)
         {
-            var book = await _dbContext.Books.FindAsync(Id);
+            var book = await _dbContext.Books.FindAsync(id);
 
             if (book == null)
-                return null;
+                throw new Exception("Book Not Found");
 
             if (dto.BookTitle != null) book.BookTitle = dto.BookTitle;
             if (dto.Author != null) book.Author = dto.Author;
@@ -57,7 +59,7 @@ namespace LibraryManagementSystem.Services
             if (dto.AvailableCopies.HasValue)
                 book.AvailableCopies = dto.AvailableCopies.Value;
 
-            if (dto.CategoryId.HasValue)
+            if (dto.CategoryId is not null)
             {
                 var category = await _dbContext.Categories.FindAsync(dto.CategoryId.Value);
 
@@ -65,50 +67,66 @@ namespace LibraryManagementSystem.Services
                 {
                     throw new Exception("Category not found");
                 }
-
                 book.CategoryId = dto.CategoryId.Value;
             }
-
             await _dbContext.SaveChangesAsync();
 
             return book;
         }
 
-        public async Task<Book?> DeleteBook(Guid Id)
+        public async Task<Book> DeleteBook(Guid id)
         {
-            var book = await _dbContext.Books.FindAsync(Id);
+            var book = await _dbContext.Books.FindAsync(id);
+            if(book == null)
+                throw new Exception("Book not found");
             _dbContext.Books.Remove(book);
             await _dbContext.SaveChangesAsync();
 
             return book;
         }
-        public async Task<Book?> IncrementAvailableBooks(Guid Id)
+        public async Task<Book> IncrementAvailableBooks(Guid id)
         {
-            var book = await _dbContext.Books.FindAsync(Id);
-            if(book == null)
+            var book = await _dbContext.Books.FindAsync(id);
+            if (book == null)
+                throw new Exception("Book Not Found");
+            if (book.AvailableCopies <= 0)
             {
-                return null ;
-            }
-            if(book.AvailableCopies <= 0)
-            {
-                return null; 
+                throw new Exception("Can't make Available copies as Negative items"); 
             }
             book.AvailableCopies--;
             await _dbContext.SaveChangesAsync();
             //var count = book.AvailableCopies;
             return book;
         }
-        public async Task<Book?> DecrementAvailableBooks(Guid Id)
+        public async Task<Book> DecrementAvailableBooks(Guid id)
         {
-            var book = await _dbContext.Books.FindAsync(Id);
-            if (book is null) return null;
-            if (book.AvailableCopies + 1 > book.TotalCopies) return null;
+            var book = await _dbContext.Books.FindAsync(id);
+            if (book is null) 
+                throw new Exception("Book not found");
+
+            if (book.AvailableCopies + 1 > book.TotalCopies)
+                throw new Exception("Can't make Available copies as More than Total Copies items");
 
             book.AvailableCopies++;
             await _dbContext.SaveChangesAsync();
 
             return book;
         }
+<<<<<<< Updated upstream
+=======
+
+        public async Task<List<Book>?> GetBooksByCategory(Guid categoryId)
+        {
+            var books = await _dbContext.Books.Where(b => b.CategoryId == categoryId).ToListAsync();
+            
+            if(books == null  || !books.Any())
+            {
+                throw new Exception("Can't Find books in this Category");
+            }
+
+            return books;
+        }
+>>>>>>> Stashed changes
             
         
     }

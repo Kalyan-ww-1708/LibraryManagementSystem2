@@ -14,9 +14,11 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(
     option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-//Adding Books logic Service here
+//Adding Buit logic Service here
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBorrowService, BorrowService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

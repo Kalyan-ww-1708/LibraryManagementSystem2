@@ -1,4 +1,4 @@
-﻿namespace LibraryManagementSystem.Model.BorrowDto
+﻿namespace LibraryManagementSystem.Dtos.BorrowDto
 {
     public class CreateBorrowDto
     {

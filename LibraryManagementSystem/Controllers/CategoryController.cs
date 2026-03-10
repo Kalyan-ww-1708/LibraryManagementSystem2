@@ -1,6 +1,6 @@
 ﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.BookDto;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +26,8 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var categories = await _categoryContext.GetAllCategory();
+                if (categories is null)
+                    return NotFound("Categories Not Found");
                 return Ok(categories);
             }
             catch (Exception e)
@@ -42,6 +44,8 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var category = await _categoryContext.GetCategoryById(id);
+                if (category is null)
+                    return NotFound("Categories Not FOund");
                 return Ok(category);
             }
             catch (Exception e)
@@ -50,14 +54,15 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
-<<<<<<< Updated upstream
-=======
+
         [HttpGet]
         [Route("cat/{name}")]
         public async Task<IActionResult> GetCategoryByName(string name) {
             try
             {
                 var categories = await _categoryContext.GetCategoryByName(name);
+                if (categories is null)
+                    return NotFound("Categories Not Found");
                 return Ok(categories);
             }catch(Exception e)
             {
@@ -66,13 +71,14 @@ namespace LibraryManagementSystem.Controllers
 
         }
 
->>>>>>> Stashed changes
-        [HttpPost]
-        public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
+       [HttpPost]
+       public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
         {
             try
             {
                 var category = await _categoryContext.CreateCategory(dto);
+                if (category is null)
+                    return NotFound("Categories Not Found");
                 return CreatedAtAction(nameof(GetCategoryById),
                 new { Id = category.CategoryId },
                 category);

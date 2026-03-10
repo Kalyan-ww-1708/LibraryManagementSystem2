@@ -1,4 +1,4 @@
-﻿namespace LibraryManagementSystem.Model.UserDto
+﻿namespace LibraryManagementSystem.Dtos.UserDto
 {
     public class CreateUserDto
     {

@@ -1,6 +1,6 @@
 ﻿
+using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.BookDto;
 using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +24,22 @@ namespace LibraryManagementSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllBooks()
         {
-            var books = await _bookService.GetAllBooks();
-            return Ok(books);
+            try
+            {
+                var books = await _bookService.GetAllBooks();
+                if (books is null) 
+                    return NotFound("Data Not Found please try again");
+                
+               return Ok(books);
+
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
         }
 
-<<<<<<< Updated upstream
-        
-=======
+
         [HttpGet]
         [Route("cat/{categoryId:guid}")]
         public async Task<IActionResult> GetBooksByCategory(Guid categoryId) {
@@ -38,6 +47,8 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var books = await _bookService.GetBooksByCategory(categoryId);
+                if (books is null) 
+                    return NotFound("Data Not Found please try again");
                 return Ok(books);
             }
             catch (Exception e)
@@ -45,7 +56,7 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }  
         }
->>>>>>> Stashed changes
+
 
         //POST https://localhost:7033/api/book
         [HttpPost]
@@ -54,6 +65,8 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var NewBook = await _bookService.CreateBook(dto);
+                if (NewBook is null) 
+                    return NotFound("Can't create the request please try again");
                 return Ok(NewBook);
             }catch(Exception e)
             {
@@ -70,6 +83,8 @@ namespace LibraryManagementSystem.Controllers
             try{
 
                 var updatedBook = await _bookService.UpdateBook(id, dto);
+                if (updatedBook is null) 
+                    return NotFound("Book Not Found");
                 return Ok(updatedBook);
             }catch(Exception e)
             {
@@ -83,6 +98,8 @@ namespace LibraryManagementSystem.Controllers
         {
             try{
                 var book = await _bookService.DeleteBook(id);
+                if (book is null) 
+                    return NotFound("Book Not Found");
                 return Ok(book);
             }catch(Exception e){
                 return BadRequest(e.Message);
@@ -94,6 +111,8 @@ namespace LibraryManagementSystem.Controllers
         {
             try{
                 var book = await _bookService.IncrementAvailableBooks(id);
+                if (book is null) 
+                    return NotFound("Can't increment Count");
                 return Ok(book);
             }
             catch (Exception e)
@@ -108,14 +127,14 @@ namespace LibraryManagementSystem.Controllers
         {
             try {
                 var book = await _bookService.DecrementAvailableBooks(id);
+                if (book is null)
+                    return NotFound("Can't increment Count");
                 return Ok(book);
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
-            }
-            
+            }   
         }
-
     }
 }

@@ -19,6 +19,13 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBorrowService, BorrowService>();
+
+
+//builder.Services.AddScoped<IPasswordService, PasswordService>();
+//builder.Services.AddScoped<IOtpService, OtpService>();
+//builder.Services.AddScoped<IEmailService, EmailService>();
+//builder.Services.AddScoped<ITokenService, TokenService>();
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

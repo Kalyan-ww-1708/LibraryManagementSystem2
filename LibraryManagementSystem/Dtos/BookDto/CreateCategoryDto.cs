@@ -1,4 +1,4 @@
-﻿namespace LibraryManagementSystem.Model.BookDto
+﻿namespace LibraryManagementSystem.Dtos.BookDto
 {
     public class CreateCategoryDto
     {

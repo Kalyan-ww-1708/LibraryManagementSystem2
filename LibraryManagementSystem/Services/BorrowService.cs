@@ -1,8 +1,10 @@
 ﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.BorrowDto;
+using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.BorrowDto;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace LibraryManagementSystem.Services
 {
@@ -48,5 +50,21 @@ namespace LibraryManagementSystem.Services
 
             return borrow;
         }
+
+        public async Task<List<ShowUserDto>> GetBorrowListByBookId(Guid bookId)
+        {
+            var result = await _dbContext.Borrows.Where(b => b.BookId == bookId).Select(b => new ShowUserDto
+            {
+                UserName = b.User.UserName,
+                Email = b.User.Email,
+                PhoneNumber = b.User.PhoneNumber}).ToListAsync();
+
+            if (!result.Any())
+                throw new Exception("No books were borrowed with that Id");
+
+            return result;
+        }
     }
+
+
 }

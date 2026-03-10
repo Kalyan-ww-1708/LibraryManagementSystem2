@@ -1,4 +1,4 @@
-﻿using LibraryManagementSystem.Model.UserDto;
+﻿using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

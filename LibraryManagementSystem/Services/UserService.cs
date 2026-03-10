@@ -1,6 +1,6 @@
 ﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.UserDto;
 using LibraryManagementSystem.Services.Interfaces;
 
 namespace LibraryManagementSystem.Services

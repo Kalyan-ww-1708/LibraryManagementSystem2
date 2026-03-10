@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LibraryManagementSystem.Model.BookDto
+namespace LibraryManagementSystem.Dtos.BookDto
 {
     public class UpdateBookDto
     {

@@ -64,6 +64,26 @@ namespace LibraryManagementSystem.Services
 
             return result;
         }
+        public async Task<Borrow?> AddReturnDate(Guid borrowId , UpdateBorrowDto dto)
+        {
+            var borrow = await _dbContext.Borrows.FindAsync(borrowId);
+            if(borrow == null) 
+                throw new Exception("Book not found");
+
+            borrow.ReturnDate = dto.ReturnDate;
+            await _dbContext.SaveChangesAsync();
+            return borrow;
+        }
+        public async Task<Borrow?> ExtendDueDate(Guid borrowId, UpdateBorrowDto dto)
+        {
+            var borrow = await _dbContext.Borrows.FindAsync(borrowId);
+            if(borrow == null) 
+                throw new Exception("Borrow Book not Found");
+            if (dto.DueDate.HasValue)
+                borrow.DueDate = dto.DueDate.Value;
+            await _dbContext.SaveChangesAsync();
+            return borrow;
+        }
     }
 
 

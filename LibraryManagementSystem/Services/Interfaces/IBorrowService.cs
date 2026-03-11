@@ -10,6 +10,8 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<List<ShowUserDto>> GetBorrowListByBookId(Guid bookId);
         Task<Borrow> CreateBorrow(CreateBorrowDto dto);
 
+        Task<Borrow?> AddReturnDate(Guid borrowId,UpdateBorrowDto dto);
+        Task<Borrow?> ExtendDueDate(Guid borrowId, UpdateBorrowDto dto);
        
     }
 }

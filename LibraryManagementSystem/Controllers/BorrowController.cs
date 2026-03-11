@@ -37,8 +37,8 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var borrowList = await _borrowService.GetBorrowListByBookId(bookId);
-                //if (borrowList is null)
-                //    return NotFound("No borrowList is Found for this book ");
+                if (borrowList is null)
+                    return NotFound("No borrowList is Found for this book ");
                 return Ok(borrowList);
             }catch(Exception e)
             {
@@ -57,6 +57,35 @@ namespace LibraryManagementSystem.Controllers
                 var borrow = await _borrowService.CreateBorrow(dto);
                 if (borrow is null)
                     return NotFound("No borrowList is Found for this book ");
+                return Ok(borrow);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("updateborrow/{borrowId:guid}")]
+        public async Task<IActionResult> AddReturnDate(Guid borrowId, [FromBody] UpdateBorrowDto dto)
+        {
+            try
+            {
+                var borrow = await _borrowService.AddReturnDate(borrowId, dto);
+                return Ok(borrow);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("updatedue/{borrowId:guid}")]
+        public async Task<IActionResult> ExtendDueDate(Guid borrowId,[FromBody] UpdateBorrowDto dto)
+        {
+            try
+            {
+                var borrow = await _borrowService.ExtendDueDate(borrowId, dto);
+                if (borrow is null) return NotFound("Request Failed");
                 return Ok(borrow);
             }catch(Exception e)
             {

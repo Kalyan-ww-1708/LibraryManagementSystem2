@@ -19,5 +19,7 @@ namespace LibraryManagementSystem.Context
 
         public DbSet<Borrow> Borrows { get; set; }
 
+        public DbSet<Admin> Admins { get; set; }
+
     }
 }

@@ -3,6 +3,7 @@ using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ namespace LibraryManagementSystem.Controllers
 
         }
 
+        
         //GET https://localhost:7033/api/book
         [HttpGet]
         public async Task<IActionResult> GetAllBooks()
@@ -106,7 +108,7 @@ namespace LibraryManagementSystem.Controllers
             }
         }
         [HttpPatch]
-        [Route("less/{id:guid}")]
+        [Route("more/{id:guid}")]
         public async Task<IActionResult> IncrementBooks(Guid id)
         {
             try{
@@ -122,7 +124,7 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpPatch]
-        [Route("more/{id:guid}")]
+        [Route("less/{id:guid}")]
         public async Task<IActionResult> DecrementAvailableBooks(Guid id)
         {
             try {

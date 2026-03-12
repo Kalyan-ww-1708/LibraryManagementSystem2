@@ -6,6 +6,8 @@ namespace LibraryManagementSystem.Services.Interfaces
     public interface IAdminService
     {
         Task<Admin?> RegisterAdmin(CreateAdminDto dto);
-        Task<LoginResponseDto?> LoginAdmin(LoginDto dto);
+        Task<string?> LoginAdmin(LoginDto dto);
+        Task<LoginResponseDto?> TfaAdmin(VerifyOtpDto otp);
+
     }
 }

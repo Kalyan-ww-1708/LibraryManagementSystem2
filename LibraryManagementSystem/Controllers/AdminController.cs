@@ -51,5 +51,25 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [Route("tfa")]
+        [HttpPost]
+        public async Task<IActionResult> TfaAdmin(VerifyOtpDto dto)
+        {
+            try
+            {
+                var admin = await _adminService.TfaAdmin(dto);
+                if (admin is null)
+                {
+                    return Unauthorized("Two factor Authentication Failed");
+                }
+                return Ok(admin);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+           
+
+        }
     }
 }

@@ -10,10 +10,14 @@ namespace LibraryManagementSystem.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ITokenService _tokenService;
-        public AdminService(ApplicationDbContext DbContext, ITokenService tokenService)
+        private readonly IOtpService _otpService;
+        private readonly IEmailService _emailService;
+        public AdminService(ApplicationDbContext DbContext, ITokenService tokenService, IOtpService otpService, IEmailService emailService)
         {
             _dbContext = DbContext;
             _tokenService = tokenService;
+            _otpService = otpService;
+            _emailService = emailService;
 
         }
 
@@ -37,7 +41,7 @@ namespace LibraryManagementSystem.Services
             return admin;
         
         }
-        public async Task<LoginResponseDto?> LoginAdmin(LoginDto dto)
+        public async Task<string?> LoginAdmin(LoginDto dto)
         {
             var admin = await _dbContext.Admins.FirstOrDefaultAsync(a =>
                     a.Email == dto.Identifier ||
@@ -49,8 +53,25 @@ namespace LibraryManagementSystem.Services
             if (dto.Password != admin.Password)
                 return null;
 
-            var token = _tokenService.GenerateToken(admin);
 
+            admin.Otp = _otpService.GenerateOtp();
+            admin.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
+            await _dbContext.SaveChangesAsync();
+            _emailService.SendOtpToMail(admin.Email, admin.Otp);
+
+            return "Otp Sent to mail please confirm two factor Authentication";
+
+            
+        }
+        public async Task<LoginResponseDto?> TfaAdmin(VerifyOtpDto dto)
+        {
+            var admin =await _dbContext.Admins.FirstOrDefaultAsync(u=> u.Email == dto.Email);
+            
+            if (admin== null || admin.Otp != dto.Otp || admin.OtpExpiry == null || admin.OtpExpiry < DateTime.UtcNow)
+            {
+                return null;
+            }
+            var token = _tokenService.GenerateToken(admin);
             return new LoginResponseDto
             {
                 Token = token,

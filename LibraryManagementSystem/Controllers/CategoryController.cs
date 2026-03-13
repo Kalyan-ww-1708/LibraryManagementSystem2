@@ -2,6 +2,7 @@
 using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +73,8 @@ namespace LibraryManagementSystem.Controllers
         }
 
        [HttpPost]
-       public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
+       [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
         {
             try
             {

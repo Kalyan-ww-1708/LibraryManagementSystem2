@@ -57,7 +57,7 @@ namespace LibraryManagementSystem.Services
             admin.Otp = _otpService.GenerateOtp();
             admin.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
             await _dbContext.SaveChangesAsync();
-            _emailService.SendOtpToMail(admin.Email, admin.Otp);
+            await _emailService.SendOtpToMail(admin.Email, admin.Otp);
 
             return "Otp Sent to mail please confirm two factor Authentication";
 
@@ -71,7 +71,7 @@ namespace LibraryManagementSystem.Services
             {
                 return null;
             }
-            var token = _tokenService.GenerateToken(admin);
+            var token = _tokenService.GenerateAdminToken(admin);
             return new LoginResponseDto
             {
                 Token = token,

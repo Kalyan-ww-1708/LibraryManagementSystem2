@@ -31,6 +31,9 @@ namespace LibraryManagementSystem.Services
                 throw new Exception("User not found");
             if (book.AvailableCopies <= 0)
                 throw new Exception("Book is not available");
+            var exist = await _dbContext.Borrows.FirstOrDefaultAsync(u =>  u.UserId ==  dto.UserId && dto.BookId == u.BookId);
+            if (exist != null) 
+                throw new Exception("Multiple books can't be taken");
 
             var borrow = new Borrow
             {
@@ -43,17 +46,14 @@ namespace LibraryManagementSystem.Services
             };
 
             await _dbContext.Borrows.AddAsync(borrow);
-
             book.AvailableCopies--;
-
             await _dbContext.SaveChangesAsync();
-
             return borrow;
         }
 
-        public async Task<List<ShowUserDto>> GetBorrowListByBookId(Guid bookId)
+        public async Task<List<UserLoginResponseDto>> GetBorrowListByBookId(Guid bookId)
         {
-            var result = await _dbContext.Borrows.Where(b => b.BookId == bookId).Select(b => new ShowUserDto
+            var result = await _dbContext.Borrows.Where(b => b.BookId == bookId).Select(b => new UserLoginResponseDto
             {
                 UserName = b.User.UserName,
                 Email = b.User.Email,
@@ -83,6 +83,11 @@ namespace LibraryManagementSystem.Services
                 borrow.DueDate = dto.DueDate.Value;
             await _dbContext.SaveChangesAsync();
             return borrow;
+        }
+        public async Task<List<Borrow>> GetBorrowListByUserId(Guid userId) { 
+
+            var borrowList = await _dbContext.Borrows.Where(u => u.UserId == userId).ToListAsync();
+            return borrowList;
         }
     }
 

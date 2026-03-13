@@ -20,7 +20,7 @@ namespace LibraryManagementSystem.Services
 
             var smtp = new SmtpClient();
             await smtp.ConnectAsync("smtp.gmail.com", 587, false);
-            await smtp.AuthenticateAsync("kalyan.arutla@gmail.com", "app-password");
+            await smtp.AuthenticateAsync("kalyan.arutla@gmail.com", "ioer yfcv cfyx znex");
             await smtp.SendAsync(message);
             await smtp.DisconnectAsync(true);
         }

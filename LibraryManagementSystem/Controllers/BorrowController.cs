@@ -1,6 +1,7 @@
 ﻿using LibraryManagementSystem.Dtos.BorrowDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystem.Controllers
@@ -16,6 +17,7 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetBorrowList()
         {
             try
@@ -32,6 +34,7 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpGet]
         [Route("{bookId:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetBorrowListByBookId(Guid bookId)
         {
             try
@@ -45,6 +48,26 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }    
         }
+
+
+        [HttpGet]
+        [Route("user/{userId:guid}")]
+        public async Task<IActionResult> GetBorrowListByUserId(Guid userId)
+        {
+            try
+            {
+                var borrowList = await  _borrowService.GetBorrowListByUserId(userId);
+                if (!borrowList.Any() )
+                    return NotFound("No books Found");
+                return Ok(borrowList);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }       
+        }
+
+
+
 
 
 

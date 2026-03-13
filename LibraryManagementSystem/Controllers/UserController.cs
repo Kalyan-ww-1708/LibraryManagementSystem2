@@ -17,11 +17,11 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> GetUserDetails(GetUserDto dto)
+        public async Task<IActionResult> LoginUser(GetUserDto dto)
         {
             try
             {
-                var user = _userService.GetUserDetails(dto);
+                var user = _userService.LoginUser(dto);
                 return Ok(user);
             }catch(Exception e)
             {
@@ -32,9 +32,9 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+        public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto dto)
         {
-            var user = await _userService.CreateUser(dto);
+            var user = await _userService.RegisterUser(dto);
             if(user is null)
             {
                 return BadRequest("Request Failed ");

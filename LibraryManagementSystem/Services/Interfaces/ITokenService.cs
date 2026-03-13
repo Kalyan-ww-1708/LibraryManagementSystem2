@@ -4,6 +4,7 @@ namespace LibraryManagementSystem.Services.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(Admin admin);
+        string GenerateAdminToken(Admin admin);
+        string GenerateUserToken(User user);
     }
 }

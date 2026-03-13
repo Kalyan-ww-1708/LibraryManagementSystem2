@@ -62,6 +62,7 @@ namespace LibraryManagementSystem.Controllers
 
         //POST https://localhost:7033/api/book
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook(CreateBookDto dto)
         {
             try
@@ -80,10 +81,10 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBook(Guid id, UpdateBookDto dto)
         {
             try{
-
                 var updatedBook = await _bookService.UpdateBook(id, dto);
                 if (updatedBook is null) 
                     return NotFound("Book Not Found");
@@ -96,6 +97,7 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(Guid id)
         {
             try{
@@ -109,6 +111,7 @@ namespace LibraryManagementSystem.Controllers
         }
         [HttpPatch]
         [Route("more/{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> IncrementBooks(Guid id)
         {
             try{
@@ -125,6 +128,7 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpPatch]
         [Route("less/{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DecrementAvailableBooks(Guid id)
         {
             try {

@@ -5,7 +5,7 @@ namespace LibraryManagementSystem.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<User?> CreateUser(CreateUserDto dto);
-        Task<User?> GetUserDetails(GetUserDto dto);
+        Task<User?> RegisterUser(CreateUserDto dto);
+        Task<UserLoginResponseDto?> LoginUser(GetUserDto dto);
     }
 }

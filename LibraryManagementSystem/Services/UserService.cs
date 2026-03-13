@@ -1,4 +1,5 @@
 ﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.AdminDto;
 using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
@@ -8,12 +9,16 @@ namespace LibraryManagementSystem.Services
     public class UserService : IUserService
     {
         private readonly ApplicationDbContext _dbContext;
-        public UserService(ApplicationDbContext DbContext)
+        private readonly ITokenService _tokenService;
+        private readonly IPasswordService _passwordService;
+        public UserService(ApplicationDbContext DbContext, ITokenService tokenService, IPasswordService passwordService)
         {
             _dbContext = DbContext;
+            _tokenService = tokenService;
+            _passwordService = passwordService;
         }
 
-        public async Task<User?> CreateUser(CreateUserDto dto)
+        public async Task<User?> RegisterUser(CreateUserDto dto)
         { 
             //Checks Email or MobileNumber Existance
             bool exist = _dbContext.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
@@ -21,29 +26,37 @@ namespace LibraryManagementSystem.Services
             {
                 throw new Exception("User Already Exist!!!");
             }
-            var user = new User()
+            var hashedPassword = _passwordService.HashPassword(dto.Password);
+;            var user = new User()
             {
                 UserId = Guid.NewGuid(),
                 UserName = dto.UserName,
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
-                Password = dto.Password,
+                Password = hashedPassword,
                 CreatedAt = DateTime.UtcNow
             };
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
             return user;
         }
-        public async Task<User?> GetUserDetails(GetUserDto dto)
+        public async Task<UserLoginResponseDto?> LoginUser(GetUserDto dto)
         {
-            var user = _dbContext.Users.FirstOrDefault(u => (!string.IsNullOrWhiteSpace(dto.Email) && u.Email == dto.Email) ||
-            (!string.IsNullOrWhiteSpace(dto.PhoneNumber) && u.PhoneNumber == dto.PhoneNumber));
+            var user = _dbContext.Users.FirstOrDefault(u =>
+                (!string.IsNullOrWhiteSpace(dto.Email) && u.Email == dto.Email) ||
+                (!string.IsNullOrWhiteSpace(dto.PhoneNumber) && u.PhoneNumber == dto.PhoneNumber));
 
-            if (user == null || user.Password != dto.Password) return null;
+            if (user == null || !_passwordService.VerifyPassword(dto.Password, user.Password))
+                return null;
 
-            return user;
+            var token = _tokenService.GenerateUserToken(user);
 
-
+            return new UserLoginResponseDto
+            {
+                Token = token,
+                UserName = user.UserName,
+                Email = user.Email
+            };
         }
     }
 }

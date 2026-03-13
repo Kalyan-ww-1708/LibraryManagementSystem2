@@ -46,6 +46,8 @@ namespace LibraryManagementSystem.Services
         public async Task<Book?> UpdateBook(Guid id, [FromBody] UpdateBookDto dto)
         {
             var book = await _dbContext.Books.FindAsync(id);
+            if (book == null) 
+                return null;
 
             if (dto.BookTitle != null) book.BookTitle = dto.BookTitle;
             if (dto.Author != null) book.Author = dto.Author;
@@ -81,6 +83,7 @@ namespace LibraryManagementSystem.Services
         public async Task<Book?> DeleteBook(Guid id)
         {
             var book = await _dbContext.Books.FindAsync(id);
+            if (book == null) return null;
             _dbContext.Books.Remove(book);
             await _dbContext.SaveChangesAsync();
 

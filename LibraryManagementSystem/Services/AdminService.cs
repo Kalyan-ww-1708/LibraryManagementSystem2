@@ -48,18 +48,17 @@ namespace LibraryManagementSystem.Services
                     a.AdminName == dto.Identifier);
 
             if (admin == null)
-                return null;
+                return null ;
 
             if (dto.Password != admin.Password)
                 return null;
-
 
             admin.Otp = _otpService.GenerateOtp();
             admin.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
             await _dbContext.SaveChangesAsync();
             await _emailService.SendOtpToMail(admin.Email, admin.Otp);
 
-            return "Otp Sent to mail please confirm two factor Authentication";
+            return admin.Email;
 
             
         }

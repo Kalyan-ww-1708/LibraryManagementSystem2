@@ -40,7 +40,7 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var admin = await _adminService.LoginAdmin(dto);
-                if (admin is null)
+                if (admin == null)
                 {
                     return NotFound("Unable to Get Admin");
                 }

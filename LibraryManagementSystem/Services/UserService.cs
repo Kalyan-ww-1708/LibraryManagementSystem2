@@ -43,8 +43,8 @@ namespace LibraryManagementSystem.Services
         public async Task<UserLoginResponseDto?> LoginUser(GetUserDto dto)
         {
             var user = _dbContext.Users.FirstOrDefault(u =>
-                (!string.IsNullOrWhiteSpace(dto.Email) && u.Email == dto.Email) ||
-                (!string.IsNullOrWhiteSpace(dto.PhoneNumber) && u.PhoneNumber == dto.PhoneNumber));
+                (!string.IsNullOrWhiteSpace(dto.Identifier) && u.Email == dto.Identifier) ||
+                (!string.IsNullOrWhiteSpace(dto.Identifier) && u.PhoneNumber == dto.Identifier));
 
             if (user == null || !_passwordService.VerifyPassword(dto.Password, user.Password))
                 return null;

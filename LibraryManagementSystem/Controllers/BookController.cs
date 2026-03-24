@@ -38,7 +38,24 @@ namespace LibraryManagementSystem.Controllers
             {
                 return BadRequest(e.Message);
             }
-            
+        }
+
+        [HttpGet]
+        [Route("li")]
+        public async Task<IActionResult> getLimitedBooks(int limit)
+        {
+            try
+            {
+                var books = await _bookService.GetLimitedBooks(limit);
+                if (books is null) {
+                    return NotFound("Data not found");
+                 }
+                return Ok(books);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
 

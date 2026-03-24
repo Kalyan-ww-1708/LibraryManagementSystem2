@@ -10,6 +10,7 @@ namespace LibraryManagementSystem.Dtos.BookDto
         public  string? Isbn { get; set; }
         public  int? AvailableCopies { get; set; }
         public  int? TotalCopies { get; set; }
+        public string? ImageUrl { get; set; }
         public Guid? CategoryId { get; set; }
       
     }

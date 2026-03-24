@@ -32,6 +32,7 @@ namespace LibraryManagementSystem.Services
                 Description = newBook.Description,
                 AvailableCopies = newBook.AvailableCopies,
                 TotalCopies = newBook.TotalCopies,
+                ImageUrl = newBook.ImageUrl
             };
             if (newBook.TotalCopies < newBook.AvailableCopies)
             {
@@ -53,6 +54,7 @@ namespace LibraryManagementSystem.Services
             if (dto.Author != null) book.Author = dto.Author;
             if (dto.Description != null) book.Description = dto.Description;
             if (dto.Isbn != null) book.Isbn = dto.Isbn;
+            if (dto.ImageUrl != null) book.ImageUrl = dto.ImageUrl;
 
             if (dto.TotalCopies.HasValue)
                 book.TotalCopies = dto.TotalCopies.Value;
@@ -133,6 +135,13 @@ namespace LibraryManagementSystem.Services
 
             return books;
         }   
-        
+        public async Task<List<Book>> GetLimitedBooks(int limit)
+        {
+            var books = _dbContext.Books.Take(limit).ToList();
+            return books;
+
+        }
+
+
     }
 }

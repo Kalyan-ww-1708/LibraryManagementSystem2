@@ -11,14 +11,16 @@ namespace LibraryManagementSystem.Dtos.BookDto
 
         public required string Description { get; set; } = "Unavaiable";
 
-
-        [Required(ErrorMessage = "ISBN can't be empty")]
-        public required string Isbn { get; set; }
+        public required string Isbn { get; set; } = "ISBN is Unavaiable";
 
         [Required(ErrorMessage = "Available copies can't be empty")]
         public required int AvailableCopies { get; set; }
 
         [Required(ErrorMessage = "Total copies can't be empty")]
         public required int TotalCopies { get; set; }
+
+        public required string ImageUrl { get; set; } = "Unavaiable";
+
     }
 }
+;

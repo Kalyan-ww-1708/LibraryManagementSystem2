@@ -115,6 +115,18 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet]
+        [Route("download-excel")]
+        public async Task<IActionResult> DownloadBorrows()
+        {
+            var fileBytes = await _borrowService.DownloadBorrowList();
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "BorrowList.xlsx"
+            );
+        }
 
     }
 }

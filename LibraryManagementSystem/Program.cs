@@ -5,8 +5,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+//This is  for basic license of the Excel package
+ExcelPackage.License.SetNonCommercialPersonal("Kalyan");
+
 
 // Add services to the container.
 
@@ -41,8 +47,6 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-
-
 
 
 builder.Services.AddOpenApi();

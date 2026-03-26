@@ -1,4 +1,5 @@
 ﻿using LibraryManagementSystem.Dtos.UserDto;
+using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,24 +23,38 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var user = _userService.LoginUser(dto);
+                if(user is null)
+                {
+                    return NotFound("User Not found please try again with proper credentials");
+                }
                 return Ok(user);
             }catch(Exception e)
             {
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong please try again" });
 
             }
            
         }
 
         [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto dto)
         {
-            var user = await _userService.RegisterUser(dto);
-            if(user is null)
+            try
             {
-                return BadRequest("Request Failed ");
+                var user = await _userService.RegisterUser(dto);
+                if (user == null)
+                {
+                    return Conflict(new { message = "User already exists" });
+                }
+           
+                return CreatedAtAction(nameof(RegisterUser), user);
             }
-            return Ok(user);
+            catch (Exception e)
+            {
+                return StatusCode(500, new { message = "Something went wrong please try again" });
+            }
+            
         }
     }
 }

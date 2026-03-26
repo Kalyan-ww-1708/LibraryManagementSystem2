@@ -23,6 +23,11 @@ namespace LibraryManagementSystem.Services
 
         public async Task<Book?> CreateBook(CreateBookDto newBook)
         {
+            var exists = await _dbContext.Books.AnyAsync(b => b.BookTitle == newBook.BookTitle);
+            if (exists)
+            {
+                return null;
+            }
             var book = new Book()
             {
                 Id = Guid.NewGuid(),
@@ -112,7 +117,7 @@ namespace LibraryManagementSystem.Services
             var book = await _dbContext.Books.FindAsync(id);
 
             if (book is null)
-                throw new Exception("Book not found");
+                return null;
 
             if (book.AvailableCopies <= 0)
                 throw new Exception("No available copies");

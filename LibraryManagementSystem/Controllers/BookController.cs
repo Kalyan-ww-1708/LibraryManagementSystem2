@@ -36,7 +36,7 @@ namespace LibraryManagementSystem.Controllers
 
             }catch(Exception e)
             {
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong" });
             }
         }
 
@@ -54,7 +54,7 @@ namespace LibraryManagementSystem.Controllers
             }
             catch(Exception e)
             {
-                return BadRequest(e);
+                return StatusCode(500, new { message = "Something went wrong" });
             }
         }
 
@@ -72,7 +72,7 @@ namespace LibraryManagementSystem.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong" });
             }  
         }
 
@@ -85,12 +85,12 @@ namespace LibraryManagementSystem.Controllers
             try
             {
                 var NewBook = await _bookService.CreateBook(dto);
-                if (NewBook is null) 
-                    return NotFound("Can't create the request please try again");
+                if (NewBook is null)
+                    return Conflict(new { message = "Book already exists" });
                 return Ok(NewBook);
             }catch(Exception e)
             {
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong" });
             }
             
         }
@@ -108,7 +108,7 @@ namespace LibraryManagementSystem.Controllers
                 return Ok(updatedBook);
             }catch(Exception e)
             {
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong" });
             }
         }
 
@@ -123,7 +123,7 @@ namespace LibraryManagementSystem.Controllers
                     return NotFound("Book Not Found");
                 return Ok(book);
             }catch(Exception e){
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong" });
             }
         }
         [HttpPatch]
@@ -139,7 +139,7 @@ namespace LibraryManagementSystem.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return StatusCode(500, new { message = "Something went wrong" });
             }
         }
 

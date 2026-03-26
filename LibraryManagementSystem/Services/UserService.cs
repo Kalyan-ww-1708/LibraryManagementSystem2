@@ -24,7 +24,7 @@ namespace LibraryManagementSystem.Services
             bool exist = _dbContext.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
             if (exist)
             {
-                throw new Exception("User Already Exist!!!");
+                return null;
             }
             var hashedPassword = _passwordService.HashPassword(dto.Password);
 ;            var user = new User()

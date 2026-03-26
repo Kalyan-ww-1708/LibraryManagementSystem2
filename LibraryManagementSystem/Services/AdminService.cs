@@ -59,8 +59,6 @@ namespace LibraryManagementSystem.Services
             await _emailService.SendOtpToMail(admin.Email, admin.Otp);
 
             return admin.Email;
-
-            
         }
         public async Task<LoginResponseDto?> TfaAdmin(VerifyOtpDto dto)
         {

@@ -11,6 +11,9 @@
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
+        public string? Status { get; set; } = "Pending";
+        public DateTime? RequestAt { get; set; } = DateTime.UtcNow;
+        public DateTime? StatusUpdatedAt { get; set; }
 
     }
 }

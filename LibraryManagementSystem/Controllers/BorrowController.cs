@@ -108,7 +108,7 @@ namespace LibraryManagementSystem.Controllers
                 return NotFound(new { message = e.Message });
             }
             catch (Exception e){
-                return BadRequest(e.Message);
+                return BadRequest(new { message = e.Message });
             }
         }
         [HttpGet]
@@ -122,6 +122,41 @@ namespace LibraryManagementSystem.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "BorrowList.xlsx"
             );
+        }
+        [HttpPut]
+        [Route("approve/{borrowId:guid}")]
+        public async Task<IActionResult> ApproveBorrowRequest(Guid borrowId )
+        {
+            try{
+                var borrow = await _borrowService.ApproveBorrowRequest(borrowId);
+                return Ok(borrow);
+            }
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){
+                return Conflict(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
+        }
+        [HttpPut]
+        [Route("reject/{borrowId:guid}")]
+        public async Task<IActionResult> RejectBorrowRequest(Guid borrowId) {
+            try{
+                var borrow = await _borrowService.RejectBorrowRequest(borrowId);
+                return Ok(borrow);
+            }
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){
+                return Conflict(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
         }
 
     }

@@ -23,7 +23,8 @@ namespace LibraryManagementSystem.Services
         { 
             //Checks Email or MobileNumber Existance
             bool exist = _dbContext.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
-            if (exist){
+            if (exist)
+            {
                 throw new ConflictException("User Already Exist!!!");
             }
             var hashedPassword = _passwordService.HashPassword(dto.Password);

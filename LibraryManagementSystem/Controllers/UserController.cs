@@ -33,6 +33,7 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto dto)
         {
             try{

@@ -14,6 +14,9 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<Borrow?> ExtendDueDate(Guid borrowId, UpdateBorrowDto dto);
         Task<List<Borrow>> GetBorrowListByUserId(Guid  UserId);
 
+        Task<string> ApproveBorrowRequest(Guid BorrowId);
+        Task<string> RejectBorrowRequest(Guid BorrowId);
+
         Task<byte[]> DownloadBorrowList();
        
     }

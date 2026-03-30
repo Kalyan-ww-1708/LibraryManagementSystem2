@@ -1,7 +1,6 @@
 ﻿using LibraryManagementSystem.Services.Interfaces;
 using MailKit.Net.Smtp;
 using MimeKit;
-using static System.Net.WebRequestMethods;
 namespace LibraryManagementSystem.Services
 {
     public class EmailService : IEmailService

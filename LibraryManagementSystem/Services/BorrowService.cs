@@ -53,25 +53,51 @@ namespace LibraryManagementSystem.Services
             if (user == null)
                 throw new NotFoundException("User not found");
             if (book.AvailableCopies <= 0)
-                throw new InValidException("Book is not available");
+                throw new InValidException("Book is currently unavailable");
             var exist = await _dbContext.Borrows.FirstOrDefaultAsync(u => u.UserId == dto.UserId && dto.BookId == u.BookId);
             if (exist != null)
                 throw new InValidException("Multiple books can't be taken");
 
-            var borrow = new Borrow
-            {
+            var borrow = new Borrow{
                 BookId = dto.BookId,
                 UserId = dto.UserId,
                 BorrowDate = dto.BorrowDate,
                 DueDate = dto.DueDate,
                 Book = book,
-                User = user
+                User = user,
             };
 
             await _dbContext.Borrows.AddAsync(borrow);
-            book.AvailableCopies--;
             await _dbContext.SaveChangesAsync();
             return borrow;
+        }
+        public async Task<string> ApproveBorrowRequest(Guid borrowId)
+        {
+            var borrow = await _dbContext.Borrows.Include(b => b.Book).FirstOrDefaultAsync(b => b.BorrowId == borrowId);
+            if (borrow == null)
+                throw new NotFoundException("Request Not found");
+            if (borrow.Status != "Pending")
+                throw new InValidException("Only pending requests can be approved");
+            if (borrow.Book.AvailableCopies <= 0)
+                throw new InValidException("No copies available");
+            borrow.Status = "Approved";
+            borrow.StatusUpdatedAt = DateTime.UtcNow;
+            borrow.Book.AvailableCopies--;
+
+            await _dbContext.SaveChangesAsync();
+            return borrow.Status;
+        }
+        public async Task<string> RejectBorrowRequest(Guid borrowId)
+        {
+            var borrow = await _dbContext.Borrows.FindAsync(borrowId);
+            if(borrow == null)
+                throw new NotFoundException("Request Not found");
+            if (borrow.Status != "Pending")
+                throw new InValidException("Only pending requests can be approved");
+            borrow.Status = "Rejected";
+            borrow.StatusUpdatedAt = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync();
+            return borrow.Status;
         }
 
         public async Task<Borrow?> AddReturnDate(Guid borrowId, UpdateBorrowDto dto)

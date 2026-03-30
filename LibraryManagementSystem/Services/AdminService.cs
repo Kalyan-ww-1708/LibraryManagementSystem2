@@ -21,9 +21,12 @@ namespace LibraryManagementSystem.Services
 
         }
 
-        public async Task<Admin?> RegisterAdmin(CreateAdminDto dto) {
-
-            var exist = await _dbContext.Admins.FirstOrDefaultAsync(u => dto.Email == u.Email);
+        public async Task<Admin?> RegisterAdmin(CreateAdminDto dto) 
+        {
+            //Check Admin Name also along with Email
+            var exist = await _dbContext.Admins.FirstOrDefaultAsync(u =>
+            u.Email == dto.Email ||
+            u.AdminName == dto.AdminName);
             if (exist !=null)
                 throw new ConflictException("Admin Already Exist");
             var admin = new Admin(){

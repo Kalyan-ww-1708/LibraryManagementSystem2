@@ -17,4 +17,8 @@
     {
         public ConflictException(string message) : base(message) { }
     }
+    public class InvalidOperationException : Exception
+    {
+        public InvalidOperationException(string message) : base(message) { }
+    }
 }

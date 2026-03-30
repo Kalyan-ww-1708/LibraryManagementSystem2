@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260305113504_IntitalMigratios")]
-    partial class IntitalMigratios
+    [Migration("20260309065840_NewMigration")]
+    partial class NewMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,6 +63,36 @@ namespace LibraryManagementSystem.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("LibraryManagementSystem.Model.Borrow", b =>
+                {
+                    b.Property<Guid>("BorrowId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("BorrowDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("BorrowId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Borrows");
+                });
+
             modelBuilder.Entity("LibraryManagementSystem.Model.Category", b =>
                 {
                     b.Property<Guid>("CategoryId")
@@ -78,6 +108,36 @@ namespace LibraryManagementSystem.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("LibraryManagementSystem.Model.User", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("LibraryManagementSystem.Model.Book", b =>
                 {
                     b.HasOne("LibraryManagementSystem.Model.Category", "Categories")
@@ -85,6 +145,25 @@ namespace LibraryManagementSystem.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Categories");
+                });
+
+            modelBuilder.Entity("LibraryManagementSystem.Model.Borrow", b =>
+                {
+                    b.HasOne("LibraryManagementSystem.Model.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryManagementSystem.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

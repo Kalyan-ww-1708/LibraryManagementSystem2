@@ -1,0 +1,132 @@
+﻿using LibraryManagementSystem.Dtos.BorrowDto;
+using LibraryManagementSystem.Model;
+using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace LibraryManagementSystem.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class BorrowController : ControllerBase
+    {
+        private readonly IBorrowService _borrowService;
+        public BorrowController(IBorrowService borrowService)
+        {
+            _borrowService = borrowService;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetBorrowList()
+        {
+            try
+            {
+                var borrowList = await _borrowService.GetBorrowList();
+                if (borrowList is null)
+                    return NotFound("No borrowList is Found ");
+                return Ok(borrowList);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("{bookId:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetBorrowListByBookId(Guid bookId)
+        {
+            try
+            {
+                var borrowList = await _borrowService.GetBorrowListByBookId(bookId);
+                if (borrowList is null)
+                    return NotFound("No borrowList is Found for this book ");
+                return Ok(borrowList);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }    
+        }
+
+
+        [HttpGet]
+        [Route("user/{userId:guid}")]
+        public async Task<IActionResult> GetBorrowListByUserId(Guid userId)
+        {
+            try
+            {
+                var borrowList = await  _borrowService.GetBorrowListByUserId(userId);
+                if (!borrowList.Any() )
+                    return NotFound("No books Found");
+                return Ok(borrowList);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }       
+        }
+
+
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBorrow(CreateBorrowDto dto)
+        {
+            try
+            {
+                var borrow = await _borrowService.CreateBorrow(dto);
+                if (borrow is null)
+                    return NotFound("No borrowList is Found for this book ");
+                return Ok(borrow);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("updateborrow/{borrowId:guid}")]
+        public async Task<IActionResult> AddReturnDate(Guid borrowId, [FromBody] UpdateBorrowDto dto)
+        {
+            try
+            {
+                var borrow = await _borrowService.AddReturnDate(borrowId, dto);
+                return Ok(borrow);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("updatedue/{borrowId:guid}")]
+        public async Task<IActionResult> ExtendDueDate(Guid borrowId,[FromBody] UpdateBorrowDto dto)
+        {
+            try
+            {
+                var borrow = await _borrowService.ExtendDueDate(borrowId, dto);
+                if (borrow is null) return NotFound("Request Failed");
+                return Ok(borrow);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("download-excel")]
+        public async Task<IActionResult> DownloadBorrows()
+        {
+            var fileBytes = await _borrowService.DownloadBorrowList();
+
+            return File(
+                fileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "BorrowList.xlsx"
+            );
+        }
+
+    }
+}

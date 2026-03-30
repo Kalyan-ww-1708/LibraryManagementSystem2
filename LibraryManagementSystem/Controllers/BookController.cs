@@ -1,6 +1,9 @@
-﻿using LibraryManagementSystem.Context;
+﻿
+using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.BookDto;
+using LibraryManagementSystem.Services;
+using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,40 +12,152 @@ namespace LibraryManagementSystem.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    public class BookController : Controller
+    public class BookController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
-        public BookController(ApplicationDbContext DbContext)
+        private readonly IBookService _bookService;
+        public BookController(IBookService bookService )
         {
-            _dbContext = DbContext;
+            _bookService = bookService;
 
         }
 
+        
         //GET https://localhost:7033/api/book
         [HttpGet]
-        public async Task<IActionResult> getAllBooks()
+        public async Task<IActionResult> GetAllBooks()
         {
-            var books = await _dbContext.Books.ToListAsync();
-            return Ok(books);
+            try
+            {
+                var books = await _bookService.GetAllBooks();
+                if (books is null) 
+                    return NotFound("Data Not Found please try again");
+                
+               return Ok(books);
+
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
+
+        [HttpGet]
+        [Route("li")]
+        public async Task<IActionResult> getLimitedBooks(int limit)
+        {
+            try
+            {
+                var books = await _bookService.GetLimitedBooks(limit);
+                if (books is null) {
+                    return NotFound("Data not found");
+                 }
+                return Ok(books);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("cat/{categoryId:guid}")]
+        public async Task<IActionResult> GetBooksByCategory(Guid categoryId) {
+
+            try
+            {
+                var books = await _bookService.GetBooksByCategory(categoryId);
+                if (books is null) 
+                    return NotFound("Data Not Found please try again");
+                return Ok(books);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }  
+        }
+
 
         //POST https://localhost:7033/api/book
         [HttpPost]
-        public async Task<IActionResult> CreateBook(CreateBookDto NewBook)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateBook(CreateBookDto dto)
         {
-            var BookEntity = new Book()
+            try
             {
-                Id = Guid.NewGuid(),
-                BookTitle = NewBook.BookTitle,
-                Author = NewBook.Author,
-                Isbn = NewBook.Isbn,
-                Description = NewBook.Description,
-                AvailableCopies = NewBook.AvailableCopies,
-                TotalCopies = NewBook.TotalCopies,
-            };
-            await _dbContext.Books.AddAsync(BookEntity);
-            await _dbContext.SaveChangesAsync();
-            return Ok(BookEntity);
+                var NewBook = await _bookService.CreateBook(dto);
+                if (NewBook is null) 
+                    return NotFound("Can't create the request please try again");
+                return Ok(NewBook);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
+        }
+
+
+        [HttpPut]
+        [Route("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateBook(Guid id, UpdateBookDto dto)
+        {
+            try{
+                var updatedBook = await _bookService.UpdateBook(id, dto);
+                if (updatedBook is null) 
+                    return NotFound("Book Not Found");
+                return Ok(updatedBook);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteBook(Guid id)
+        {
+            try{
+                var book = await _bookService.DeleteBook(id);
+                if (book is null) 
+                    return NotFound("Book Not Found");
+                return Ok(book);
+            }catch(Exception e){
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPatch]
+        [Route("more/{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> IncrementBooks(Guid id)
+        {
+            try{
+                var book = await _bookService.IncrementAvailableBooks(id);
+                if (book is null) 
+                    return NotFound("Can't increment Count");
+                return Ok(book);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPatch]
+        [Route("less/{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DecrementAvailableBooks(Guid id)
+        {
+            try {
+                var book = await _bookService.DecrementAvailableBooks(id);
+                if (book is null)
+                    return NotFound("Can't increment Count");
+                return Ok(book);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }   
         }
     }
 }

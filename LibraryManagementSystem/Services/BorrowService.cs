@@ -20,22 +20,43 @@ namespace LibraryManagementSystem.Services
         public async Task<List<Borrow>> GetBorrowList()
         {
             var borrows = await _dbContext.Borrows.Include(b => b.Book).Include(b => b.User).ToListAsync();
-
             return borrows;
         }
+        public async Task<List<Borrow>> GetBorrowListByUserId(Guid userId)
+        {
+
+            var borrowList = await _dbContext.Borrows.Where(u => u.UserId == userId).ToListAsync();
+            return borrowList;
+        }
+        public async Task<List<UserLoginResponseDto>> GetBorrowListByBookId(Guid bookId)
+        {
+            var result = await _dbContext.Borrows.Where(b => b.BookId == bookId).Select(b => new UserLoginResponseDto
+            {
+                UserName = b.User.UserName,
+                Email = b.User.Email,
+                PhoneNumber = b.User.PhoneNumber
+            }).ToListAsync();
+
+            if (!result.Any())
+                return null;
+
+            return result;
+        }
+
+
         public async Task<Borrow> CreateBorrow(CreateBorrowDto dto)
         {
             var book = await _dbContext.Books.FindAsync(dto.BookId);
             if (book == null)
-                throw new Exception("Book not found");
+                throw new NotFoundException("Book not found");
             var user = await _dbContext.Users.FindAsync(dto.UserId);
             if (user == null)
-                throw new Exception("User not found");
+                throw new NotFoundException("User not found");
             if (book.AvailableCopies <= 0)
-                throw new Exception("Book is not available");
+                throw new InValidException("Book is not available");
             var exist = await _dbContext.Borrows.FirstOrDefaultAsync(u => u.UserId == dto.UserId && dto.BookId == u.BookId);
             if (exist != null)
-                throw new Exception("Multiple books can't be taken");
+                throw new InValidException("Multiple books can't be taken");
 
             var borrow = new Borrow
             {
@@ -53,25 +74,11 @@ namespace LibraryManagementSystem.Services
             return borrow;
         }
 
-        public async Task<List<UserLoginResponseDto>> GetBorrowListByBookId(Guid bookId)
-        {
-            var result = await _dbContext.Borrows.Where(b => b.BookId == bookId).Select(b => new UserLoginResponseDto
-            {
-                UserName = b.User.UserName,
-                Email = b.User.Email,
-                PhoneNumber = b.User.PhoneNumber
-            }).ToListAsync();
-
-            if (!result.Any())
-                throw new Exception("No books were borrowed with that Id");
-
-            return result;
-        }
         public async Task<Borrow?> AddReturnDate(Guid borrowId, UpdateBorrowDto dto)
         {
             var borrow = await _dbContext.Borrows.FindAsync(borrowId);
             if (borrow == null)
-                throw new Exception("Book not found");
+                throw new NotFoundException("Book not found");
 
             borrow.ReturnDate = dto.ReturnDate;
             await _dbContext.SaveChangesAsync();
@@ -81,19 +88,13 @@ namespace LibraryManagementSystem.Services
         {
             var borrow = await _dbContext.Borrows.FindAsync(borrowId);
             if (borrow == null)
-                throw new Exception("Borrow Book not Found");
+                throw new NotFoundException("Borrow Book not Found");
             if (dto.DueDate.HasValue)
                 borrow.DueDate = dto.DueDate.Value;
             await _dbContext.SaveChangesAsync();
             return borrow;
         }
-        public async Task<List<Borrow>> GetBorrowListByUserId(Guid userId)
-        {
-
-            var borrowList = await _dbContext.Borrows.Where(u => u.UserId == userId).ToListAsync();
-            return borrowList;
-        }
-
+       
         public async Task<byte[]> DownloadBorrowList()
         {
             var borrowList = await _dbContext.Borrows.Select(b => new { b.BorrowId, BookTitle = b.Book.BookTitle, UserName = b.User.UserName, 
@@ -111,10 +112,7 @@ namespace LibraryManagementSystem.Services
             sheet.Cells[1, 6].Value = "ReturnDate";
             sheet.Cells[1, 7].Value = "PhoneNumber";
 
-
-
-            for (int i = 0; i < borrowList.Count; i++)
-            {
+            for (int i = 0; i < borrowList.Count; i++){
                 var b = borrowList[i];
 
                 sheet.Cells[i + 2, 1].Value = b.BorrowId;

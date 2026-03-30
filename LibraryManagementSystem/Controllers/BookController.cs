@@ -1,9 +1,11 @@
 ﻿
+using LibraryManagementSystem.Context;
 using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,18 +26,12 @@ namespace LibraryManagementSystem.Controllers
         
         //GET https://localhost:7033/api/book
         [HttpGet]
-        public async Task<IActionResult> GetAllBooks()
-        {
-            try
-            {
+        public async Task<IActionResult> GetAllBooks(){
+            try{
                 var books = await _bookService.GetAllBooks();
-                if (books is null) 
-                    return NotFound("Data Not Found please try again");
-                
                return Ok(books);
 
-            }catch(Exception e)
-            {
+            }catch(Exception e){
                 return BadRequest(e.Message);
             }
         }
@@ -44,17 +40,15 @@ namespace LibraryManagementSystem.Controllers
         [Route("li")]
         public async Task<IActionResult> getLimitedBooks(int limit)
         {
-            try
-            {
+            try{
                 var books = await _bookService.GetLimitedBooks(limit);
-                if (books is null) {
-                    return NotFound("Data not found");
-                 }
                 return Ok(books);
             }
-            catch(Exception e)
-            {
-                return BadRequest(e);
+            catch(InValidException e){
+                return Conflict(new { message = e.Message });
+            }
+            catch(Exception e){
+                return BadRequest(new { message = e.Message });
             }
         }
 
@@ -63,8 +57,7 @@ namespace LibraryManagementSystem.Controllers
         [Route("cat/{categoryId:guid}")]
         public async Task<IActionResult> GetBooksByCategory(Guid categoryId) {
 
-            try
-            {
+            try{
                 var books = await _bookService.GetBooksByCategory(categoryId);
                 if (books is null) 
                     return NotFound("Data Not Found please try again");
@@ -79,7 +72,7 @@ namespace LibraryManagementSystem.Controllers
 
         //POST https://localhost:7033/api/book
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook(CreateBookDto dto)
         {
             try
@@ -98,23 +91,25 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBook(Guid id, UpdateBookDto dto)
         {
             try{
                 var updatedBook = await _bookService.UpdateBook(id, dto);
-                if (updatedBook is null) 
-                    return NotFound("Book Not Found");
                 return Ok(updatedBook);
-            }catch(Exception e)
-            {
-                return BadRequest(e.Message);
+            }catch(NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }catch(InValidException e) { 
+                return NotFound(new { message = e.Message }); 
+            }
+            catch(Exception e){
+                return BadRequest(new { message = e.Message } );
             }
         }
 
         [HttpDelete]
         [Route("{id:guid}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(Guid id)
         {
             try{
@@ -122,40 +117,51 @@ namespace LibraryManagementSystem.Controllers
                 if (book is null) 
                     return NotFound("Book Not Found");
                 return Ok(book);
-            }catch(Exception e){
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }
         }
         [HttpPatch]
         [Route("more/{id:guid}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> IncrementBooks(Guid id)
         {
             try{
                 var book = await _bookService.IncrementAvailableBooks(id);
-                if (book is null) 
-                    return NotFound("Can't increment Count");
                 return Ok(book);
             }
-            catch (Exception e)
-            {
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }
         }
 
         [HttpPatch]
         [Route("less/{id:guid}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DecrementAvailableBooks(Guid id)
         {
             try {
                 var book = await _bookService.DecrementAvailableBooks(id);
-                if (book is null)
-                    return NotFound("Can't increment Count");
                 return Ok(book);
             }
-            catch (Exception e)
-            {
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){ 
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e) { 
                 return BadRequest(e.Message);
             }   
         }

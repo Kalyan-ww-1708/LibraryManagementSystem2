@@ -25,11 +25,8 @@ namespace LibraryManagementSystem.Services
 
             var exist = await _dbContext.Admins.FirstOrDefaultAsync(u => dto.Email == u.Email);
             if (exist !=null)
-            {
-                return null;
-            }
-            var admin = new Admin()
-            {
+                throw new ConflictException("Admin Already Exist");
+            var admin = new Admin(){
                 AdminId = Guid.NewGuid(),
                 AdminName = dto.AdminName,
                 Email = dto.Email,
@@ -48,10 +45,10 @@ namespace LibraryManagementSystem.Services
                     a.AdminName == dto.Identifier);
 
             if (admin == null)
-                return null ;
+                throw new NotFoundException("Admin Not Found");
 
             if (dto.Password != admin.Password)
-                return null;
+                throw new UnauthorizedException("Invalid Credentials");
 
             admin.Otp = _otpService.GenerateOtp();
             admin.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
@@ -66,9 +63,8 @@ namespace LibraryManagementSystem.Services
         {
             var admin =await _dbContext.Admins.FirstOrDefaultAsync(u=> u.Email == dto.Email);
             
-            if (admin== null || admin.Otp != dto.Otp || admin.OtpExpiry == null || admin.OtpExpiry < DateTime.UtcNow)
-            {
-                return null;
+            if (admin== null || admin.Otp != dto.Otp || admin.OtpExpiry == null || admin.OtpExpiry < DateTime.UtcNow){
+                throw new UnauthorizedException("Invalid Credentials");
             }
             var token = _tokenService.GenerateAdminToken(admin);
             return new LoginResponseDto

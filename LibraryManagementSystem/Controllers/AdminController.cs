@@ -1,5 +1,7 @@
-﻿using LibraryManagementSystem.Dtos.AdminDto;
+﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.AdminDto;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystem.Controllers
@@ -19,17 +21,15 @@ namespace LibraryManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterAdmin([FromBody]  CreateAdminDto dto)
         {
-            try
-            {
+            try{
                 var admin = await _adminService.RegisterAdmin(dto);
-                if (admin is null)
-                {
-                    return NotFound("Unable to create Admin");
-                }
                 return Ok(admin);
-            }catch(Exception e)
-            {
-                return BadRequest(e.Message);
+            }
+            catch(ConflictException e){
+                return Conflict(new { message = e.Message });
+            }
+            catch(Exception e){
+                return BadRequest(new { message = e.Message });
             }
         }
 
@@ -37,18 +37,15 @@ namespace LibraryManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> LoginAdmin([FromBody] LoginDto dto)
         {
-            try
-            {
+            try{
                 var admin = await _adminService.LoginAdmin(dto);
-                if (admin == null)
-                {
-                    return NotFound("Unable to Get Admin");
-                }
                 return Ok(admin);
             }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
             }
         }
 
@@ -56,20 +53,15 @@ namespace LibraryManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> TfaAdmin(VerifyOtpDto dto)
         {
-            try
-            {
+            try{
                 var admin = await _adminService.TfaAdmin(dto);
-                if (admin is null)
-                {
-                    return Unauthorized("Two factor Authentication Failed");
-                }
                 return Ok(admin);
-            }catch(Exception e)
-            {
-                return BadRequest(e.Message);
+            }catch (UnauthorizedException e){
+                return Unauthorized(new { message = e.Message });
             }
-           
-
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
         }
     }
 }

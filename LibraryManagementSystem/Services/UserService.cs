@@ -3,6 +3,7 @@ using LibraryManagementSystem.Dtos.AdminDto;
 using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
+using System.Collections;
 
 namespace LibraryManagementSystem.Services
 {
@@ -22,9 +23,8 @@ namespace LibraryManagementSystem.Services
         { 
             //Checks Email or MobileNumber Existance
             bool exist = _dbContext.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
-            if (exist)
-            {
-                throw new Exception("User Already Exist!!!");
+            if (exist){
+                throw new ConflictException("User Already Exist!!!");
             }
             var hashedPassword = _passwordService.HashPassword(dto.Password);
 ;            var user = new User()
@@ -45,9 +45,9 @@ namespace LibraryManagementSystem.Services
             var user = _dbContext.Users.FirstOrDefault(u =>
                 (!string.IsNullOrWhiteSpace(dto.Identifier) && u.Email == dto.Identifier) ||
                 (!string.IsNullOrWhiteSpace(dto.Identifier) && u.PhoneNumber == dto.Identifier));
-
+      
             if (user == null || !_passwordService.VerifyPassword(dto.Password, user.Password))
-                return null;
+                throw new UnauthorizedException("Invalid Credentials");
 
             var token = _tokenService.GenerateUserToken(user);
 

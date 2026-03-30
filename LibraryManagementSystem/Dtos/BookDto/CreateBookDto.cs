@@ -19,7 +19,7 @@ namespace LibraryManagementSystem.Dtos.BookDto
         [Required(ErrorMessage = "Total copies can't be empty")]
         public required int TotalCopies { get; set; }
 
-        public required string ImageUrl { get; set; } = "Unavaiable";
+        public string ImageUrl { get; set; } = "Unavaiable";
 
     }
 }

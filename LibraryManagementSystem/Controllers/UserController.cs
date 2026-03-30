@@ -1,4 +1,5 @@
-﻿using LibraryManagementSystem.Dtos.UserDto;
+﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,27 +20,32 @@ namespace LibraryManagementSystem.Controllers
         [Route("login")]
         public async Task<IActionResult> LoginUser(GetUserDto dto)
         {
-            try
-            {
+            try{
                 var user = _userService.LoginUser(dto);
                 return Ok(user);
-            }catch(Exception e)
-            {
-                return BadRequest(e.Message);
-
             }
-           
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch(Exception e){
+                return BadRequest(new {message = e.Message});
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto dto)
         {
-            var user = await _userService.RegisterUser(dto);
-            if(user is null)
-            {
-                return BadRequest("Request Failed ");
+            try{
+                var user = await _userService.RegisterUser(dto);
+                return Ok(user);
             }
-            return Ok(user);
+            catch(ConflictException e){
+                return Conflict(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
+
         }
     }
 }

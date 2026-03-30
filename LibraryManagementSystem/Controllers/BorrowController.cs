@@ -1,4 +1,5 @@
-﻿using LibraryManagementSystem.Dtos.BorrowDto;
+﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.BorrowDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -17,72 +18,66 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetBorrowList()
         {
-            try
-            {
+            try{
                 var borrowList = await _borrowService.GetBorrowList();
-                if (borrowList is null)
-                    return NotFound("No borrowList is Found ");
                 return Ok(borrowList);
-            }catch(Exception e)
-            {
+            }
+            catch (NotFoundException e){ 
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }
         }
 
         [HttpGet]
         [Route("{bookId:guid}")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetBorrowListByBookId(Guid bookId)
         {
-            try
-            {
+            try{
                 var borrowList = await _borrowService.GetBorrowListByBookId(bookId);
                 if (borrowList is null)
                     return NotFound("No borrowList is Found for this book ");
                 return Ok(borrowList);
-            }catch(Exception e)
-            {
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }    
         }
-
 
         [HttpGet]
         [Route("user/{userId:guid}")]
         public async Task<IActionResult> GetBorrowListByUserId(Guid userId)
         {
-            try
-            {
+            try{
                 var borrowList = await  _borrowService.GetBorrowListByUserId(userId);
-                if (!borrowList.Any() )
-                    return NotFound("No books Found");
+                if (borrowList is null)
+                    return NotFound("No borrowList is Found for this book");
                 return Ok(borrowList);
-            }catch(Exception e)
-            {
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }       
         }
 
-
-
-
-
-
-
         [HttpPost]
         public async Task<IActionResult> CreateBorrow(CreateBorrowDto dto)
         {
-            try
-            {
+            try{
                 var borrow = await _borrowService.CreateBorrow(dto);
-                if (borrow is null)
-                    return NotFound("No borrowList is Found for this book ");
                 return Ok(borrow);
-            }catch(Exception e)
-            {
+            }
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }
         }
@@ -105,13 +100,14 @@ namespace LibraryManagementSystem.Controllers
         [Route("updatedue/{borrowId:guid}")]
         public async Task<IActionResult> ExtendDueDate(Guid borrowId,[FromBody] UpdateBorrowDto dto)
         {
-            try
-            {
+            try{
                 var borrow = await _borrowService.ExtendDueDate(borrowId, dto);
-                if (borrow is null) return NotFound("Request Failed");
                 return Ok(borrow);
-            }catch(Exception e)
-            {
+            }
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
                 return BadRequest(e.Message);
             }
         }

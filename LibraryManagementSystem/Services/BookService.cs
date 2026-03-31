@@ -132,6 +132,11 @@ namespace LibraryManagementSystem.Services
             return books;
 
         }
+        public async Task<int> GetBooksCount()
+        {
+            var count = await _dbContext.Books.CountAsync();
+            return count;
+        }
 
 
     }

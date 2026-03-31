@@ -7,5 +7,6 @@ namespace LibraryManagementSystem.Services.Interfaces
     {
         Task<User?> RegisterUser(CreateUserDto dto);
         Task<UserLoginResponseDto?> LoginUser(GetUserDto dto);
+        Task<int> GetUsersCount();
     }
 }

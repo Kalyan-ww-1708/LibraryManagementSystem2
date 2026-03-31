@@ -14,6 +14,5 @@
         public string? Status { get; set; } = "Pending";
         public DateTime? RequestAt { get; set; } = DateTime.UtcNow;
         public DateTime? StatusUpdatedAt { get; set; }
-
     }
 }

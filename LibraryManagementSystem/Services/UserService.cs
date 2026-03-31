@@ -3,6 +3,7 @@ using LibraryManagementSystem.Dtos.AdminDto;
 using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections;
 
 namespace LibraryManagementSystem.Services
@@ -58,6 +59,11 @@ namespace LibraryManagementSystem.Services
                 UserName = user.UserName,
                 Email = user.Email
             };
+        }
+        public async Task<int> GetUsersCount()
+        {
+            var count = await _dbContext.Users.CountAsync();
+            return count;
         }
     }
 }

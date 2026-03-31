@@ -1,6 +1,7 @@
 ﻿using LibraryManagementSystem.Context;
 using LibraryManagementSystem.Dtos.BorrowDto;
 using LibraryManagementSystem.Model;
+using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +63,18 @@ namespace LibraryManagementSystem.Controllers
             catch (Exception e){
                 return BadRequest(e.Message);
             }       
+        }
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> GetBooksCount()
+        {
+            try{
+                var count = await _borrowService.GetBorrowCount();
+                return Ok(count);
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         [HttpPost]

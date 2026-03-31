@@ -69,6 +69,17 @@ namespace LibraryManagementSystem.Controllers
             }  
         }
 
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> GetBooksCount()
+        {
+            try{
+                var count = await _bookService.GetBooksCount();
+                return Ok(count);
+            }catch(Exception e) {
+                return BadRequest(new { message = e.Message });
+            }
+        }
 
         //POST https://localhost:7033/api/book
         [HttpPost]

@@ -1,5 +1,6 @@
 ﻿using LibraryManagementSystem.Context;
 using LibraryManagementSystem.Dtos.UserDto;
+using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,20 @@ namespace LibraryManagementSystem.Controllers
         {
             _userService = UserService;
 
+        }
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> GetBooksCount()
+        {
+            try
+            {
+                var count = await _userService.GetUsersCount();
+                return Ok(count);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         [HttpPost]

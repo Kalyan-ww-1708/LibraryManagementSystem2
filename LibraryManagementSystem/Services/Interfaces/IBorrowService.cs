@@ -18,6 +18,7 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<string> RejectBorrowRequest(Guid BorrowId);
 
         Task<byte[]> DownloadBorrowList();
-       
+        Task<int> GetBorrowCount();
+
     }
 }

@@ -13,6 +13,7 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<Book> IncrementAvailableBooks(Guid id);
         Task<Book> DecrementAvailableBooks(Guid id);
         Task<List<Book>> GetBooksByCategory(Guid categoryId);
+        Task<int> GetBooksCount();
 
 
     }

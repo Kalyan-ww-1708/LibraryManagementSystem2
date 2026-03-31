@@ -107,6 +107,8 @@ namespace LibraryManagementSystem.Services
                 throw new NotFoundException("Book not found");
 
             borrow.ReturnDate = dto.ReturnDate;
+            borrow.Status = "Returned";
+            borrow.StatusUpdatedAt = DateTime.UtcNow;
             await _dbContext.SaveChangesAsync();
             return borrow;
         }
@@ -157,6 +159,11 @@ namespace LibraryManagementSystem.Services
             sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
 
             return package.GetAsByteArray();
+        }
+        public async Task<int> GetBorrowCount()
+        {
+            var count = await _dbContext.Borrows.Where(u => u.Status == "Approved").CountAsync();
+            return count;
         }
     }
 

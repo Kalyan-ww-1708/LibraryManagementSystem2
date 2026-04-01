@@ -108,6 +108,23 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet]
+        [Route("approval")]
+        public async Task<IActionResult> BorrowListForApprovals()
+        {
+            try{
+                var result = await _borrowService.BorrowListForApprovals(); 
+                return Ok(result);
+            }
+            catch(NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+
+            catch(Exception e){
+                return BadRequest(new { message = e.Message });
+            }
+            
+        }
 
         [HttpPatch]
         [Route("updatedue/{borrowId:guid}")]

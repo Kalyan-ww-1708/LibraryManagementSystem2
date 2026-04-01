@@ -19,6 +19,7 @@ namespace LibraryManagementSystem.Services.Interfaces
 
         Task<byte[]> DownloadBorrowList();
         Task<int> GetBorrowCount();
+        Task<List<Borrow>> BorrowListForApprovals();
 
     }
 }

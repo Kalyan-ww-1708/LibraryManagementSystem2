@@ -89,7 +89,7 @@ namespace LibraryManagementSystem.Services
         }
         public async Task<List<Borrow>> BorrowListForApprovals()
         {
-            var borrows = await _dbContext.Borrows.Where(b => b.Status == "Pending").ToListAsync();
+            var borrows = await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).ToListAsync();
             if (!borrows.Any())
                 throw new NotFoundException("No Borrows Currently");
             return borrows;

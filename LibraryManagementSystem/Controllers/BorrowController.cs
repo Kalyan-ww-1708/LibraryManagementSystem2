@@ -154,7 +154,7 @@ namespace LibraryManagementSystem.Controllers
             );
         }
         [HttpPut]
-        [Route("approve/{borrowId:guid}")]
+        [Route("/{borrowId:guid}")]
         public async Task<IActionResult> ApproveBorrowRequest(Guid borrowId )
         {
             try{

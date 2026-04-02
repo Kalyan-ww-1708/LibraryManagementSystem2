@@ -37,7 +37,7 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpGet]
-        [Route("li")]
+        [Route("li/{limit:int}")]
         public async Task<IActionResult> getLimitedBooks(int limit)
         {
             try{

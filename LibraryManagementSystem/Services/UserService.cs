@@ -1,10 +1,10 @@
 ﻿using LibraryManagementSystem.Context;
-using LibraryManagementSystem.Dtos.AdminDto;
 using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace LibraryManagementSystem.Services
 {
@@ -13,35 +13,147 @@ namespace LibraryManagementSystem.Services
         private readonly ApplicationDbContext _dbContext;
         private readonly ITokenService _tokenService;
         private readonly IPasswordService _passwordService;
-        public UserService(ApplicationDbContext DbContext, ITokenService tokenService, IPasswordService passwordService)
+        private readonly IOtpService _otpService;
+        private readonly IEmailService _emailService;
+        private readonly IDistributedCache _cacheService;
+        public UserService(ApplicationDbContext DbContext, ITokenService tokenService, IPasswordService passwordService,IOtpService otpService, IEmailService emailService, IDistributedCache cacheService)
         {
             _dbContext = DbContext;
             _tokenService = tokenService;
             _passwordService = passwordService;
+            _emailService = emailService;
+            _otpService = otpService;
+            _cacheService = cacheService;
         }
 
-        public async Task<User?> RegisterUser(CreateUserDto dto)
-        { 
-            //Checks Email or MobileNumber Existance
-            bool exist = _dbContext.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
+        // This is for normal registration without Otp
+        //public async Task<User?> RegisterUser(CreateUserDto dto)
+        //{ 
+        //    //Checks Email or MobileNumber Existance
+        //    bool exist = _dbContext.Users.Any(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
+        //    if (exist)
+        //    {
+        //        throw new ConflictException("User Already Exist!!!");
+        //    }
+        //    var otp = _otpService.GenerateOtp();
+        //    var hashedOtp = BCrypt.Net.BCrypt.HashPassword(otp);
+
+        //    // Store OTP
+        //    await _cacheService.SetStringAsync(dto.Email, hashedOtp, new DistributedCacheEntryOptions
+        //    {
+        //        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        //    });
+
+
+        //    await _emailService.SendOtpToMail(dto.Email,otp);
+        //    var hashedPassword = _passwordService.HashPassword(dto.Password);
+        //    var user = new User()
+        //    {
+        //        UserId = Guid.NewGuid(),
+        //        UserName = dto.UserName,
+        //        Email = dto.Email,
+        //        PhoneNumber = dto.PhoneNumber,
+        //        Password = hashedPassword,
+        //        CreatedAt = DateTime.UtcNow
+        //    };
+        //    await _dbContext.Users.AddAsync(user);
+        //    await _dbContext.SaveChangesAsync();
+        //    return user;
+        //}
+
+        public async Task<string> RegisterUser(CreateUserDto dto)
+        {
+            bool exist = await _dbContext.Users.AnyAsync(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
             if (exist)
+                throw new ConflictException("User Already Exists!");
+
+            var otp = _otpService.GenerateOtp();
+            var hashedOtp = BCrypt.Net.BCrypt.HashPassword(otp);
+
+            await _cacheService.SetStringAsync(dto.Email, hashedOtp, new DistributedCacheEntryOptions
             {
-                throw new ConflictException("User Already Exist!!!");
-            }
-            var hashedPassword = _passwordService.HashPassword(dto.Password);
-;            var user = new User()
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
+
+            // Store user data temporarily and saves that in cache along with hashed Otp
+            var tempUser = JsonSerializer.Serialize(dto);
+
+            await _cacheService.SetStringAsync($"user_{dto.Email}", tempUser,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
+            await _emailService.SendOtpToMail(dto.Email, otp);
+            return "Otp Sent";
+        }
+
+        public async Task<User> VerifyUser(UserVerifyOtpDto dto)
+        {
+            //Gets otp based on email from cache memory and unhash it.
+            var storedHashedOtp = await _cacheService.GetStringAsync(dto.Email);
+
+            if (storedHashedOtp == null)
+                throw new Exception("OTP expired");
+
+            bool isValid = BCrypt.Net.BCrypt.Verify(dto.Otp, storedHashedOtp);
+
+            if (!isValid)
+                throw new Exception("Invalid OTP");
+
+            var userDataJson = await _cacheService.GetStringAsync($"user_{dto.Email}");
+
+            if (userDataJson == null)
+                throw new Exception("Session expired");
+
+            var userDto = JsonSerializer.Deserialize<CreateUserDto>(userDataJson);
+
+            var hashedPassword = _passwordService.HashPassword(userDto.Password);
+
+            var user = new User
             {
                 UserId = Guid.NewGuid(),
-                UserName = dto.UserName,
-                Email = dto.Email,
-                PhoneNumber = dto.PhoneNumber,
+                UserName = userDto.UserName,
+                Email = userDto.Email,
+                PhoneNumber = userDto.PhoneNumber,
                 Password = hashedPassword,
                 CreatedAt = DateTime.UtcNow
             };
+
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
+
+            await _cacheService.RemoveAsync(dto.Email);
+            await _cacheService.RemoveAsync($"user_{dto.Email}");
+
             return user;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public async Task<UserLoginResponseDto?> LoginUser(GetUserDto dto)
         {
             var user = _dbContext.Users.FirstOrDefault(u =>

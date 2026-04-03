@@ -27,7 +27,7 @@ namespace LibraryManagementSystem.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(e.Message);
             }
         }
 
@@ -40,13 +40,28 @@ namespace LibraryManagementSystem.Controllers
                 return Ok(user);
             }
             catch (NotFoundException e){
-                return NotFound(new { message = e.Message });
+                return NotFound(e.Message);
             }
             catch(Exception e){
-                return BadRequest(new {message = e.Message});
+                return BadRequest(e.Message);
             }
         }
-
+        // This is for normal Registration
+        //[HttpPost]
+        //[Route("register")]
+        //public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto dto)
+        //{
+        //    try{
+        //        var user = await _userService.RegisterUser(dto);
+        //        return Ok(user);
+        //    }
+        //    catch(ConflictException e){
+        //        return Conflict(e.Message);
+        //    }
+        //    catch (Exception e){
+        //        return BadRequest(e.Message);
+        //    }
+        //}
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserDto dto)
@@ -55,13 +70,25 @@ namespace LibraryManagementSystem.Controllers
                 var user = await _userService.RegisterUser(dto);
                 return Ok(user);
             }
-            catch(ConflictException e){
-                return Conflict(new { message = e.Message });
+            catch (ConflictException e){
+                return Conflict(e.Message);
             }
             catch (Exception e){
-                return BadRequest(new { message = e.Message });
+                return BadRequest(e.Message);
             }
-
         }
+        [HttpPost]
+        [Route("verify")]
+        public async Task<IActionResult> VerifyOtp([FromBody] UserVerifyOtpDto dto)
+        {
+            try{
+                var user = await _userService.VerifyUser(dto);
+                return Ok(user);
+            }
+            catch (Exception e){
+                return BadRequest(e.Message);
+            }
+        }
+
     }
 }

@@ -25,7 +25,7 @@ namespace LibraryManagementSystem.Services
         public async Task<List<Borrow>> GetBorrowListByUserId(Guid userId)
         {
 
-            var borrowList = await _dbContext.Borrows.Where(u => u.UserId == userId).ToListAsync();
+            var borrowList = await _dbContext.Borrows.Where(u => u.UserId == userId).Include(b => b.Book).ToListAsync();
             return borrowList;
         }
         public async Task<List<UserLoginResponseDto>> GetBorrowListByBookId(Guid bookId)
@@ -83,7 +83,6 @@ namespace LibraryManagementSystem.Services
             borrow.Status = "Approved";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
             borrow.Book.AvailableCopies--;
-
             await _dbContext.SaveChangesAsync();
             return borrow.Status;
         }
@@ -107,16 +106,28 @@ namespace LibraryManagementSystem.Services
             await _dbContext.SaveChangesAsync();
             return borrow.Status;
         }
+        public async Task<string> ApproveReturnRequest(Guid borrowId)
+        {
+            var borrow = await _dbContext.Borrows.Include(b => b.Book).FirstOrDefaultAsync(b => b.BorrowId == borrowId);
+            if (borrow == null)
+                throw new NotFoundException("Request Not found");
+            if (borrow.Status == "Returned"|| borrow.Status ==  "Pending" || borrow.Status == "Rejected")
+                throw new InValidException("Invalid Borrow Please Try Again");
+            borrow.Status = "Returned";
+            borrow.StatusUpdatedAt = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync();
+            return "Successfully Returned";
 
+        }
         public async Task<Borrow?> AddReturnDate(Guid borrowId, UpdateBorrowDto dto)
         {
             var borrow = await _dbContext.Borrows.FindAsync(borrowId);
             if (borrow == null)
                 throw new NotFoundException("Book not found");
-
+            if (borrow.ReturnDate != null)
+                throw new Exception("Book already returned");
             borrow.ReturnDate = dto.ReturnDate;
-            borrow.Status = "Returned";
-            borrow.StatusUpdatedAt = DateTime.UtcNow;
+            borrow.Status = "Returned Raised";
             await _dbContext.SaveChangesAsync();
             return borrow;
         }

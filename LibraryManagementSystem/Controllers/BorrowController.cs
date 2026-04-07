@@ -109,6 +109,29 @@ namespace LibraryManagementSystem.Controllers
             }
         }
         [HttpGet]
+        [Route("approveRetutn/{borrowId:guid}")]
+        //2eea1db7-0e56-40b0-72a3-08de90a1f7ea
+        public async Task<IActionResult> ApproveReturnRequest(Guid borrowId)
+        {
+            try{
+                var borrow = await _borrowService.ApproveReturnRequest(borrowId);
+                return Ok(borrow);
+            }
+            catch(InValidException e){
+                return Conflict(e.Message);
+            }
+            catch(NotFoundException e){
+                return NotFound(e.Message);
+            }
+            catch(Exception e){
+                return BadRequest(e.Message);
+            }
+            
+            
+        }
+
+
+        [HttpGet]
         [Route("approval")]
         public async Task<IActionResult> BorrowListForApprovals()
         {

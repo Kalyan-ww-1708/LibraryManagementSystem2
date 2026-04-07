@@ -16,10 +16,12 @@ namespace LibraryManagementSystem.Services.Interfaces
 
         Task<string> ApproveBorrowRequest(Guid BorrowId);
         Task<string> RejectBorrowRequest(Guid BorrowId);
+        Task<string> ApproveReturnRequest(Guid BorrowId);
 
         Task<byte[]> DownloadBorrowList();
         Task<int> GetBorrowCount();
         Task<List<Borrow>> BorrowListForApprovals();
+      
 
     }
 }

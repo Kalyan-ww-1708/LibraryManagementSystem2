@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using OfficeOpenXml;
+using LibraryManagementSystem.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,9 +40,17 @@ builder.Services.AddCors(options =>
 
 //Adding Buit logic Service here
 builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+
 builder.Services.AddScoped<IBorrowService, BorrowService>();
+builder.Services.AddScoped<IBorrowRepository, BorrowRepository>();
+
+
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOtpService, OtpService>();

@@ -1,24 +1,24 @@
 ﻿using LibraryManagementSystem.Context;
 using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
+using LibraryManagementSystem.Repository;
 using LibraryManagementSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace LibraryManagementSystem.Services
 {
     public class BookService : IBookService
     {
-        private readonly ApplicationDbContext _dbContext;
-        public BookService(ApplicationDbContext DbContext)
+        private readonly IBookRepository _bookRepository;
+        public BookService(IBookRepository bookRepository)
         {
-            _dbContext = DbContext;
+            _bookRepository = bookRepository;
         }
 
         public async Task<List<Book>> GetAllBooks()
         {
 
-            return await _dbContext.Books.ToListAsync();
+            return await _bookRepository.GetAllAsync();
         }
 
         public async Task<Book?> CreateBook(CreateBookDto newBook){
@@ -35,14 +35,14 @@ namespace LibraryManagementSystem.Services
             if (newBook.TotalCopies < newBook.AvailableCopies){
                 throw new InValidException("Available copies cannot exceed total copies");
             }
-            await _dbContext.Books.AddAsync(book);
-            await _dbContext.SaveChangesAsync();
+            await _bookRepository.AddAsync(book);
+            await _bookRepository.SaveChangesAsync();
 
             return book;
         }
 
         public async Task<Book?> UpdateBook(Guid id, UpdateBookDto dto){
-            var book = await _dbContext.Books.FindAsync(id);
+            var book = await _bookRepository.GetByIdAsync(id);
             if (book == null)
                 throw new NotFoundException("Book Not Found");
 
@@ -62,30 +62,30 @@ namespace LibraryManagementSystem.Services
             book.AvailableCopies = availableCopies;
 
             if (dto.CategoryId is not null){
-                var category = await _dbContext.Categories.FindAsync(dto.CategoryId.Value);
+                var category = await _bookRepository.GetByCategoryAsync(dto.CategoryId.Value);
                 if (category == null)
                     throw new NotFoundException("Category not found");
                 book.CategoryId = dto.CategoryId.Value;
             }
-            await _dbContext.SaveChangesAsync();
+            await _bookRepository.SaveChangesAsync();
 
             return book;
         }
 
         public async Task<Book?> DeleteBook(Guid id)
         {
-            var book = await _dbContext.Books.FindAsync(id);
+            //var book = await _dbContext.Books.FindAsync(id);
+            var book = await _bookRepository.GetByIdAsync(id);
             if (book == null)
                 throw new  NotFoundException("Book Not Found");
-            _dbContext.Books.Remove(book);
-            await _dbContext.SaveChangesAsync();
-
+            await _bookRepository.DeleteAsync(book);
+            await _bookRepository.SaveChangesAsync();
             return book;
         }
         
         public async Task<Book> IncrementAvailableBooks(Guid id)
         {
-            var book = await _dbContext.Books.FindAsync(id);
+            var book = await _bookRepository.GetByIdAsync(id);
 
             if (book is null)
                 throw new NotFoundException("Book not found");
@@ -94,13 +94,13 @@ namespace LibraryManagementSystem.Services
                 throw new InValidException("Available copies cannot exceed total copies");
 
             book.AvailableCopies++;
-            await _dbContext.SaveChangesAsync();
+            await _bookRepository.SaveChangesAsync();
 
             return book;
         }
         public async Task<Book> DecrementAvailableBooks(Guid id)
         {
-            var book = await _dbContext.Books.FindAsync(id);
+            var book = await _bookRepository.GetByIdAsync(id);
 
             if (book is null)
                 throw new NotFoundException("Book not found");
@@ -109,7 +109,7 @@ namespace LibraryManagementSystem.Services
                 throw new InValidException("No available copies");
 
             book.AvailableCopies--;
-            await _dbContext.SaveChangesAsync();
+            await _bookRepository.SaveChangesAsync();
 
             return book;
         }
@@ -117,7 +117,7 @@ namespace LibraryManagementSystem.Services
 
         public async Task<List<Book>> GetBooksByCategory(Guid categoryId)
         {
-            var books = await _dbContext.Books.Where(b => b.CategoryId == categoryId).ToListAsync();
+            var books = await _bookRepository.GetByCategoryAsync(categoryId);
             
             if(books == null  || !books.Any())
             {
@@ -128,16 +128,14 @@ namespace LibraryManagementSystem.Services
         }   
         public async Task<List<Book>> GetLimitedBooks(int limit)
         {
-            var books = _dbContext.Books.Take(limit).ToList();
+            var books = await _bookRepository.GetLimitedAsync(limit);
             return books;
 
         }
         public async Task<int> GetBooksCount()
         {
-            var count = await _dbContext.Books.CountAsync();
+            var count = await _bookRepository.GetCountAsync();
             return count;
         }
-
-
     }
 }

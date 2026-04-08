@@ -2,60 +2,52 @@
 using LibraryManagementSystem.Dtos.BorrowDto;
 using LibraryManagementSystem.Dtos.UserDto;
 using LibraryManagementSystem.Model;
+using LibraryManagementSystem.Repository;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
-using static System.Reflection.Metadata.BlobBuilder;
 
 
 namespace LibraryManagementSystem.Services
 {
     public class BorrowService : IBorrowService
     {
-        private readonly ApplicationDbContext _dbContext;
-        public BorrowService(ApplicationDbContext DbContext)
+        private readonly IBorrowRepository _borrowRepository;
+        public BorrowService(IBorrowRepository borrowRepository)
         {
-            _dbContext = DbContext;
+            _borrowRepository = borrowRepository;
         }
         public async Task<List<Borrow>> GetBorrowList()
         {
-            var borrows = await _dbContext.Borrows.Include(b => b.Book).Include(b => b.User).ToListAsync();
+            var borrows = await _borrowRepository.GetAllAsync();
             return borrows;
         }
         public async Task<List<Borrow>> GetBorrowListByUserId(Guid userId)
         {
 
-            var borrowList = await _dbContext.Borrows.Where(u => u.UserId == userId).Include(b => b.Book).ToListAsync();
+            var borrowList = await _borrowRepository.GetByUserIdAsync(userId);
             return borrowList;
         }
-        public async Task<List<UserLoginResponseDto>> GetBorrowListByBookId(Guid bookId)
+        public async Task<List<Borrow>> GetBorrowListByBookId(Guid bookId)
         {
-            var result = await _dbContext.Borrows.Where(b => b.BookId == bookId).Select(b => new UserLoginResponseDto
-            {
-                UserName = b.User.UserName,
-                Email = b.User.Email,
-                PhoneNumber = b.User.PhoneNumber
-            }).ToListAsync();
-
-            if (!result.Any())
-                return null;
-
-            return result;
+            var borrowList = await _borrowRepository.GetByBookIdAsync(bookId);
+            return borrowList;
         }
 
 
         public async Task<Borrow> CreateBorrow(CreateBorrowDto dto)
         {
-            var book = await _dbContext.Books.FindAsync(dto.BookId);
+            var book = await _borrowRepository.GetBookByBookId(dto.BookId);
+            //var book = await _dbContext.Books.FindAsync(dto.BookId);
             if (book == null)
                 throw new NotFoundException("Book not found");
-            var user = await _dbContext.Users.FindAsync(dto.UserId);
+            var user = await _borrowRepository.GetUserByUserId(dto.UserId);
             if (user == null)
                 throw new NotFoundException("User not found");
             if (book.AvailableCopies <= 0)
                 throw new InValidException("Book is currently unavailable");
-            var exist = await _dbContext.Borrows.FirstOrDefaultAsync(u => u.UserId == dto.UserId && dto.BookId == u.BookId);
-            if (exist != null)
+            var exist = await _borrowRepository.ExistanceAsync(dto.UserId, dto.BookId);
+            if (exist)
                 throw new InValidException("Multiple books can't be taken");
 
             var borrow = new Borrow{
@@ -67,86 +59,81 @@ namespace LibraryManagementSystem.Services
                 User = user,
             };
 
-            await _dbContext.Borrows.AddAsync(borrow);
-            await _dbContext.SaveChangesAsync();
+            await _borrowRepository.AddAsync(borrow);
+            await _borrowRepository.SaveChangesAsync();
             return borrow;
         }
         public async Task<string> ApproveBorrowRequest(Guid borrowId)
         {
-            var borrow = await _dbContext.Borrows.Include(b => b.Book).FirstOrDefaultAsync(b => b.BorrowId == borrowId);
+            var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             if (borrow == null)
                 throw new NotFoundException("Request Not found");
             if (borrow.Status != "Pending")
                 throw new InValidException("Only pending requests can be approved");
-            if (borrow.Book.AvailableCopies <= 0)
+            if (borrow.Book?.AvailableCopies <= 0)
                 throw new InValidException("No copies available");
             borrow.Status = "Approved";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
-            borrow.Book.AvailableCopies--;
-            await _dbContext.SaveChangesAsync();
+            borrow.Book!.AvailableCopies--;
+            await _borrowRepository.SaveChangesAsync();
             return borrow.Status;
         }
         public async Task<List<Borrow>> BorrowListForApprovals()
         {
-            var borrows = await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).ToListAsync();
-            if (!borrows.Any())
-                throw new NotFoundException("No Borrows Currently");
+            var borrows = await _borrowRepository.GetApprovalBorrowsAsync();
             return borrows;
         }
         
         public async Task<string> RejectBorrowRequest(Guid borrowId)
         {
-            var borrow = await _dbContext.Borrows.FindAsync(borrowId);
+            var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             if(borrow == null)
                 throw new NotFoundException("Request Not found");
             if (borrow.Status != "Pending")
                 throw new InValidException("Only pending requests can be approved");
             borrow.Status = "Rejected";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
-            await _dbContext.SaveChangesAsync();
+            await _borrowRepository.SaveChangesAsync();
             return borrow.Status;
         }
         public async Task<string> ApproveReturnRequest(Guid borrowId)
         {
-            var borrow = await _dbContext.Borrows.Include(b => b.Book).FirstOrDefaultAsync(b => b.BorrowId == borrowId);
+            var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             if (borrow == null)
                 throw new NotFoundException("Request Not found");
             if (borrow.Status == "Returned"|| borrow.Status ==  "Pending" || borrow.Status == "Rejected")
                 throw new InValidException("Invalid Borrow Please Try Again");
             borrow.Status = "Returned";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
-            await _dbContext.SaveChangesAsync();
+            await _borrowRepository.SaveChangesAsync();
             return "Successfully Returned";
-
         }
         public async Task<Borrow?> AddReturnDate(Guid borrowId, UpdateBorrowDto dto)
         {
-            var borrow = await _dbContext.Borrows.FindAsync(borrowId);
+            var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             if (borrow == null)
                 throw new NotFoundException("Book not found");
             if (borrow.ReturnDate != null)
                 throw new Exception("Book already returned");
             borrow.ReturnDate = dto.ReturnDate;
             borrow.Status = "Returned Raised";
-            await _dbContext.SaveChangesAsync();
+            await _borrowRepository.SaveChangesAsync();
             return borrow;
         }
         public async Task<Borrow?> ExtendDueDate(Guid borrowId, UpdateBorrowDto dto)
         {
-            var borrow = await _dbContext.Borrows.FindAsync(borrowId);
+            var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             if (borrow == null)
                 throw new NotFoundException("Borrow Book not Found");
             if (dto.DueDate.HasValue)
                 borrow.DueDate = dto.DueDate.Value;
-            await _dbContext.SaveChangesAsync();
+            await _borrowRepository.SaveChangesAsync();
             return borrow;
         }
        
         public async Task<byte[]> DownloadBorrowList()
         {
-            var borrowList = await _dbContext.Borrows.Select(b => new { b.BorrowId, BookTitle = b.Book.BookTitle, UserName = b.User.UserName, 
-                PhoneNumber = b.User.PhoneNumber,
-                b.BorrowDate, b.DueDate, b.ReturnDate}).ToListAsync();
+            var borrowList = await _borrowRepository.GetAllAsync();
 
             using var package = new ExcelPackage();
             var sheet = package.Workbook.Worksheets.Add("BorrowList");
@@ -159,21 +146,25 @@ namespace LibraryManagementSystem.Services
             sheet.Cells[1, 6].Value = "ReturnDate";
             sheet.Cells[1, 7].Value = "PhoneNumber";
 
-            for (int i = 0; i < borrowList.Count; i++){
-                var b = borrowList[i];
+            int row = 2;
 
-                sheet.Cells[i + 2, 1].Value = b.BorrowId;
-                sheet.Cells[i + 2, 2].Value = b.BookTitle;
-                sheet.Cells[i + 2, 3].Value = b.UserName;
-                sheet.Cells[i + 2, 4].Value = b.BorrowDate;
-                sheet.Cells[i + 2, 4].Style.Numberformat.Format = "yyyy-mm-dd";
+            foreach (var b in borrowList)
+            {
+                sheet.Cells[row, 1].Value = b.BorrowId;
+                sheet.Cells[row, 2].Value = b.Book != null ? b.Book.BookTitle : "Unknown";
+                sheet.Cells[row, 3].Value = b.User != null ? b.User.UserName : "Unknown";
+                sheet.Cells[row, 4].Value = b.BorrowDate;
+                sheet.Cells[row, 4].Style.Numberformat.Format = "yyyy-mm-dd";
 
-                sheet.Cells[i + 2, 5].Value = b.DueDate;
-                sheet.Cells[i + 2, 5].Style.Numberformat.Format = "yyyy-mm-dd";
+                sheet.Cells[row, 5].Value = b.DueDate;
+                sheet.Cells[row, 5].Style.Numberformat.Format = "yyyy-mm-dd";
 
-                sheet.Cells[i + 2, 6].Value = b.ReturnDate ?? (object)"";
-                sheet.Cells[i + 2, 6].Style.Numberformat.Format = "yyyy-mm-dd";
-                sheet.Cells[i + 2, 7].Value = b.PhoneNumber;
+                sheet.Cells[row, 6].Value = b.ReturnDate ?? (object)"";
+                sheet.Cells[row, 6].Style.Numberformat.Format = "yyyy-mm-dd";
+
+                sheet.Cells[row, 7].Value = b.User != null ? b.User.PhoneNumber : "Unknow";
+
+                row++;
             }
             sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
 
@@ -181,8 +172,7 @@ namespace LibraryManagementSystem.Services
         }
         public async Task<int> GetBorrowCount()
         {
-            var count = await _dbContext.Borrows.Where(u => u.Status == "Approved").CountAsync();
-            return count;
+            return await _borrowRepository.GetCountAsync();
         }
     }
 

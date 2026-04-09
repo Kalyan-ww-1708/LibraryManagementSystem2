@@ -89,6 +89,55 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpPost]
+        [Route("send-otp")]
+        public async Task<IActionResult> OtpForForgetOtp([FromBody] SendEmailDto dto)
+        {
+            try
+            {
+                var user = await _userService.ForgotPassword(dto);
+                return Ok(user);
+            }catch(NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost]
+        [Route("verify-forgot-otp")]
+        public async Task<IActionResult> VerifyForgotOtp([FromBody] UserVerifyOtpDto dto)
+        {
+            try
+            {
+                var user = await _userService.VerifyForgotPasswordOtp(dto);
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            try
+            {
+                var user = await _userService.ResetPassword(dto);
+                return Ok(user);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
     }
 }

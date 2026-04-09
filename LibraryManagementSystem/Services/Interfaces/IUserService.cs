@@ -10,5 +10,8 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<int> GetUsersCount();
         Task<string> RegisterUser(CreateUserDto dto);
         Task<User> VerifyUser(UserVerifyOtpDto dto);
+        Task<string> ForgotPassword(SendEmailDto dto);
+        Task<string> VerifyForgotPasswordOtp(UserVerifyOtpDto dto);
+        Task<string> ResetPassword(ResetPasswordDto dto);
     }
 }

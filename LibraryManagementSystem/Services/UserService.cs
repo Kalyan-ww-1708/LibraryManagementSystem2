@@ -152,5 +152,69 @@ namespace LibraryManagementSystem.Services
             var count = await _dbContext.Users.CountAsync();
             return count;
         }
+
+
+
+
+        public async Task<string> ForgotPassword(SendEmailDto dto)
+        {
+            bool exist = await _dbContext.Users.AnyAsync(u => u.Email == dto.Email);
+            if (!exist)
+                throw new NotFoundException("User Doesn't Exists!");
+
+            var otp = _otpService.GenerateOtp();
+            var hashedOtp = BCrypt.Net.BCrypt.HashPassword(otp);
+
+            await _cacheService.SetStringAsync(dto.Email, hashedOtp, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
+
+            // Store user data temporarily and saves that in cache along with hashed Otp
+
+            await _emailService.SendOtpToMail(dto.Email, otp);
+            return "Otp Sent";
+        }
+
+        public async Task<string> VerifyForgotPasswordOtp(UserVerifyOtpDto dto)
+        {
+            //Gets otp based on email from cache memory and unhash it.
+            var storedHashedOtp = await _cacheService.GetStringAsync(dto.Email);
+
+            if (storedHashedOtp == null)
+                throw new Exception("OTP expired");
+
+            bool isValid = BCrypt.Net.BCrypt.Verify(dto.Otp, storedHashedOtp);
+
+            if (!isValid)
+                throw new Exception("Invalid OTP");
+
+
+            await _cacheService.SetStringAsync($"verified_{dto.Email}", "true",
+                 new DistributedCacheEntryOptions
+                 {
+                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                 });
+
+            return "OTP Verified";
+        }
+        public async Task<string> ResetPassword(ResetPasswordDto dto)
+        {
+            var Verified = await _cacheService.GetStringAsync($"verified_{dto.Email}");
+
+            if (Verified == null) throw new Exception("Otp Expired Please Try Again");
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+
+            await _dbContext.SaveChangesAsync();
+            await _cacheService.RemoveAsync(dto.Email);
+            await _cacheService.RemoveAsync($"verified_{dto.Email}");
+
+            return "Password reset successfully";
+        }
     }
 }

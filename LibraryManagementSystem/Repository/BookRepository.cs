@@ -58,5 +58,11 @@ namespace LibraryManagementSystem.Repository
             _dbContext.Books.Update(book);
             await Task.CompletedTask; 
         }
+
+        public async Task<Book?> GetBookByTitleAsync(string bookTitle) {
+
+            return await _dbContext.Books.FirstOrDefaultAsync(b => b.BookTitle == bookTitle);
+        
+        }
     }
 }

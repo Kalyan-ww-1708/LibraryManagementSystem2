@@ -92,11 +92,16 @@ namespace LibraryManagementSystem.Controllers
                 if (NewBook is null) 
                     return NotFound("Can't create the request please try again");
                 return Ok(NewBook);
-            }catch(Exception e)
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
-            
+
         }
 
 

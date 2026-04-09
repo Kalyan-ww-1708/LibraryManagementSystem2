@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj" Id="75066e45-582d-45d5-8137-0c55b771b81d" />
+  <Project Path="LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj" />
   <Project Path="LibraryManagementSystem/LibraryManagementSystem.csproj" />
 </Solution>

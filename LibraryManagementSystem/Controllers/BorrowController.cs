@@ -35,6 +35,24 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpGet]
+        [Route("b/{borrowId:guid}")]
+        public async Task<IActionResult> GetBorrowWithId(Guid borrowId)
+        {
+            try
+            {
+                var borrowList = await _borrowService.GetBorrowWithId(borrowId);
+                if (borrowList is null)
+                    return NotFound("No borrowList is Found for this book ");
+                return Ok(borrowList);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
+        [HttpGet]
         [Route("{bookId:guid}")]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetBorrowListByBookId(Guid bookId)

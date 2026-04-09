@@ -13,5 +13,6 @@ namespace LibraryManagementSystem.Repository
         Task UpdateAsync(Book book);
         Task DeleteAsync(Book book);
         Task SaveChangesAsync();
+        Task<Book?> GetBookByTitleAsync(string bookTitle);
     }
 }

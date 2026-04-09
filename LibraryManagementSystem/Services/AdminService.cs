@@ -58,9 +58,7 @@ namespace LibraryManagementSystem.Services
             await _dbContext.SaveChangesAsync();
             await _emailService.SendOtpToMail(admin.Email, admin.Otp);
 
-            return admin.Email;
-
-            
+            return admin.Email;  
         }
         public async Task<LoginResponseDto?> TfaAdmin(VerifyOtpDto dto)
         {

@@ -7,6 +7,7 @@ namespace LibraryManagementSystem.Services.Interfaces
     public interface IBorrowService
     {
         Task<List<Borrow>> GetBorrowList(); //Good
+        Task<Borrow> GetBorrowWithId(Guid borrowId);
         Task<List<Borrow>> GetBorrowListByBookId(Guid bookId); //Good
         Task<Borrow> CreateBorrow(CreateBorrowDto dto);
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LibraryManagementSystem.Model.BookDto
+namespace LibraryManagementSystem.Dtos.BookDto
 {
     public class UpdateBookDto
     {
@@ -10,6 +10,7 @@ namespace LibraryManagementSystem.Model.BookDto
         public  string? Isbn { get; set; }
         public  int? AvailableCopies { get; set; }
         public  int? TotalCopies { get; set; }
+        public string? ImageUrl { get; set; }
         public Guid? CategoryId { get; set; }
       
     }

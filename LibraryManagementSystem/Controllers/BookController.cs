@@ -1,8 +1,11 @@
 ﻿
+using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.BookDto;
 using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,73 +23,158 @@ namespace LibraryManagementSystem.Controllers
 
         }
 
+        
         //GET https://localhost:7033/api/book
         [HttpGet]
-        public async Task<IActionResult> GetAllBooks()
-        {
-            var books = await _bookService.GetAllBooks();
-            return Ok(books);
+        public async Task<IActionResult> GetAllBooks(){
+            try{
+                var books = await _bookService.GetAllBooks();
+               return Ok(books);
+
+            }catch(Exception e){
+                return BadRequest(e.Message);
+            }
         }
 
-        
+        [HttpGet]
+        [Route("li/{limit:int}")]
+        public async Task<IActionResult> getLimitedBooks(int limit)
+        {
+            try{
+                var books = await _bookService.GetLimitedBooks(limit);
+                return Ok(books);
+            }
+            catch(InValidException e){
+                return Conflict(new { message = e.Message });
+            }
+            catch(Exception e){
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+
+        [HttpGet]
+        [Route("cat/{categoryId:guid}")]
+        public async Task<IActionResult> GetBooksByCategory(Guid categoryId) {
+
+            try{
+                var books = await _bookService.GetBooksByCategory(categoryId);
+                if (books is null) 
+                    return NotFound("Data Not Found please try again");
+                return Ok(books);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }  
+        }
+
+        [HttpGet]
+        [Route("count")]
+        public async Task<IActionResult> GetBooksCount()
+        {
+            try{
+                var count = await _bookService.GetBooksCount();
+                return Ok(count);
+            }catch(Exception e) {
+                return BadRequest(new { message = e.Message });
+            }
+        }
 
         //POST https://localhost:7033/api/book
         [HttpPost]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook(CreateBookDto dto)
         {
-            var NewBook = await _bookService.CreateBook(dto);
-            return Ok(NewBook); 
+            try
+            {
+                var NewBook = await _bookService.CreateBook(dto);
+                if (NewBook is null) 
+                    return NotFound("Can't create the request please try again");
+                return Ok(NewBook);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
         }
 
 
         [HttpPut]
-        [Route("{Id:guid}")]
-        public async Task<IActionResult> UpdateBook(Guid Id, UpdateBookDto dto)
+        [Route("{id:guid}")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateBook(Guid id, UpdateBookDto dto)
         {
-            var updatedBook = await _bookService.UpdateBook(Id, dto);
-            if (updatedBook is null)
-            {
-                return NotFound("Data is Not Updated");
+            try{
+                var updatedBook = await _bookService.UpdateBook(id, dto);
+                return Ok(updatedBook);
+            }catch(NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }catch(InValidException e) { 
+                return NotFound(new { message = e.Message }); 
             }
-            return Ok(updatedBook);
+            catch(Exception e){
+                return BadRequest(new { message = e.Message } );
+            }
         }
 
         [HttpDelete]
-        [Route("{Id:guid}")]
-        public async Task<IActionResult> DeleteBook(Guid Id)
+        [Route("{id:guid}")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteBook(Guid id)
         {
-            var book = await _bookService.DeleteBook(Id);
-            if(book is null)
-            {
-                return NotFound("Book Not found");
+            try{
+                var book = await _bookService.DeleteBook(id);
+                if (book is null) 
+                    return NotFound("Book Not Found");
+                return Ok(book);
             }
-            return Ok(book);
+            catch (NotFoundException e)
+            {
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(e.Message);
+            }
         }
         [HttpPatch]
-        [Route("less/{Id:Guid}")]
-        public async Task<IActionResult> IncrementBooks(Guid Id)
+        [Route("more/{id:guid}")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> IncrementBooks(Guid id)
         {
-            var book = await _bookService.IncrementAvailableBooks(Id);
-            if (book is null)
-            {
-                return BadRequest("Request Failed");
-
+            try{
+                var book = await _bookService.IncrementAvailableBooks(id);
+                return Ok(book);
             }
-
-            return Ok(book);
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPatch]
-        [Route("more/{Id:Guid}")]
-        public async Task<IActionResult> DecrementAvailableBooks(Guid Id)
+        [Route("less/{id:guid}")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DecrementAvailableBooks(Guid id)
         {
-            var book = await _bookService.DecrementAvailableBooks(Id);
-            if(book is null)
-            {
-                return BadRequest("Request Failed");
+            try {
+                var book = await _bookService.DecrementAvailableBooks(id);
+                return Ok(book);
             }
-            return Ok(book);
+            catch (NotFoundException e){
+                return NotFound(new { message = e.Message });
+            }
+            catch (InValidException e){ 
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e) { 
+                return BadRequest(e.Message);
+            }   
         }
-
     }
 }

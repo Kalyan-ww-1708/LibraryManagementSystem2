@@ -1,7 +1,8 @@
 ﻿using LibraryManagementSystem.Context;
+using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Model.BookDto;
 using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,42 +20,73 @@ namespace LibraryManagementSystem.Controllers
 
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetAllCategory()
         {
-            var categories = await _categoryContext.GetAllCategory();
-            if(!categories.Any())
-            {
-                return NotFound("No categories found");
+            try{
+                var categories = await _categoryContext.GetAllCategory();
+                return Ok(categories);
             }
-            return Ok(categories);
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
 
         }
 
         [HttpGet]
-        [Route("{Id:Guid}")]
-        public async Task<IActionResult> GetCategoryById(Guid Id)
+        [Route("{id:guid}")]
+        public async Task<IActionResult> GetCategoryById(Guid id)
         {
-            var category = await _categoryContext.GetCategoryById(Id);
-            if(category is null)
-            {
-                return NotFound();
+            try{
+                var category = await _categoryContext.GetCategoryById(id);
+                return Ok(category);
             }
-            return Ok(category);
+            catch(NotFoundException e){
+                return NotFound(new {message = e.Message});
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+
+        [HttpGet]
+        [Route("cat/{name}")]
+        public async Task<IActionResult> GetCategoryByName(string name)
+        {
+            try{
+                var categories = await _categoryContext.GetCategoryByName(name);
+     
+                return Ok(categories);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
         }
 
         [HttpPost]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCategory(CreateCategoryDto dto)
         {
-            var category = await _categoryContext.CreateCategory(dto);
-
-            return CreatedAtAction(nameof(GetCategoryById),
+            try{
+                var category = await _categoryContext.CreateCategory(dto);
+                return CreatedAtAction(nameof(GetCategoryById),
                 new { Id = category.CategoryId },
                 category);
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
-
-
     }
 }
 

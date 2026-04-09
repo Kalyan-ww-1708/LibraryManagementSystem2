@@ -4,6 +4,7 @@ using LibraryManagementSystem.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309070418_Migrations")]
+    partial class Migrations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,35 +24,6 @@ namespace LibraryManagementSystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("LibraryManagementSystem.Model.Admin", b =>
-                {
-                    b.Property<Guid>("AdminId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AdminName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Otp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("OtpExpiry")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AdminId");
-
-                    b.ToTable("Admins");
-                });
 
             modelBuilder.Entity("LibraryManagementSystem.Model.Book", b =>
                 {
@@ -73,9 +47,6 @@ namespace LibraryManagementSystem.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Isbn")
@@ -107,16 +78,7 @@ namespace LibraryManagementSystem.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RequestAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime?>("ReturnDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("StatusUpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")

@@ -11,9 +11,12 @@ namespace LibraryManagementSystem.Model
         public required string Isbn { get; set; }
         public required int AvailableCopies { get; set; }
         public required int TotalCopies { get; set; }
+        public string? ImageUrl { get; set; }
         public Guid? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
         public  Category? Categories { get; set; }
+
+        // public string? ImageUrl { get; set; }
     }
 }

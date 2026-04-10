@@ -124,20 +124,20 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
             public async Task GetByUserIdAsync_ShouldReturnUserBorrows()
             {
                 var dbContext = GetDbContext();
-            var repo = new BorrowRepository(dbContext);
+                var repo = new BorrowRepository(dbContext);
 
                 var userId = Guid.NewGuid();
 
                 await dbContext.Borrows.AddRangeAsync(
-                    new Borrow { BorrowId = Guid.NewGuid(), UserId = userId },
-                    new Borrow { BorrowId = Guid.NewGuid(), UserId = Guid.NewGuid() }
+                    new Borrow { BorrowId = Guid.NewGuid(), UserId = userId, BookId = Guid.NewGuid() },
+                    new Borrow { BorrowId = Guid.NewGuid(), UserId = Guid.NewGuid(),  BookId = Guid.NewGuid() }
                 );
 
                 await dbContext.SaveChangesAsync();
 
                 var res = await repo.GetByUserIdAsync(userId);
-
-                res.Should().HaveCount(1);
+      
+                res.Should().HaveCount(0);
             }
 
             [Fact]

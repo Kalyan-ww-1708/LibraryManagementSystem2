@@ -47,7 +47,7 @@ namespace LibraryManagementSystem.Repository
         }
         public async Task<List<Borrow>> GetByUserIdAsync(Guid userId)
         {
-            return await _dbContext.Borrows.Where(b => b.UserId == userId).ToListAsync();
+            return await _dbContext.Borrows.Where(b => b.UserId == userId).Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
 
         public async Task<List<Borrow>> GetByBookIdAsync(Guid bookId)

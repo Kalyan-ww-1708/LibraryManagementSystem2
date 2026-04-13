@@ -37,7 +37,11 @@
                 var borrowList = await _borrowRepository.GetByBookIdAsync(bookId);
                 return borrowList;
             }
-
+            public async Task<List<Borrow>> GetRecentBorrow()
+            {
+                var borrowList = await _borrowRepository.GetRecentList();
+                return borrowList;
+            }
 
             public async Task<Borrow> CreateBorrow(CreateBorrowDto dto)
             {
@@ -120,7 +124,7 @@
                 if (borrow.ReturnDate != null)
                     throw new Exception("Book already returned");
                 borrow.ReturnDate = dto.ReturnDate;
-                borrow.Status = "Returned Raised";
+                borrow.Status = "Return Raised";
                 await _borrowRepository.SaveChangesAsync();
                 return borrow;
             }
@@ -134,7 +138,14 @@
                 await _borrowRepository.SaveChangesAsync();
                 return borrow;
             }
-       
+        public async Task<List<Borrow>> GetReturnBorrowsAsync()
+        {
+            var borrowList = await _borrowRepository.GetReturnBorrowsAsync();
+            if (borrowList == null) return null;
+            return borrowList;
+        }
+
+
             public async Task<byte[]> DownloadBorrowList()
             {
                 var borrowList = await _borrowRepository.GetAllAsync();

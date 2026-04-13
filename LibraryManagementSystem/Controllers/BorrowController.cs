@@ -94,6 +94,17 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(new { message = e.Message });
             }
         }
+        [HttpGet("recent")]
+        public async Task<IActionResult> GetLatestBorrows()
+        {
+            try{
+                var result = await _borrowService.GetRecentBorrow();
+                return Ok(result);
+            }
+            catch (Exception e){
+                return BadRequest(new { message = e.Message });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateBorrow(CreateBorrowDto dto)
@@ -126,8 +137,8 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet]
-        [Route("approveRetutn/{borrowId:guid}")]
+        [HttpPatch]
+        [Route("approve-return/{borrowId:guid}")]
         //2eea1db7-0e56-40b0-72a3-08de90a1f7ea
         public async Task<IActionResult> ApproveReturnRequest(Guid borrowId)
         {
@@ -143,9 +154,7 @@ namespace LibraryManagementSystem.Controllers
             }
             catch(Exception e){
                 return BadRequest(e.Message);
-            }
-            
-            
+            }   
         }
 
 
@@ -195,7 +204,7 @@ namespace LibraryManagementSystem.Controllers
             );
         }
         [HttpPut]
-        [Route("/{borrowId:guid}")]
+        [Route("approve/{borrowId:guid}")]
         public async Task<IActionResult> ApproveBorrowRequest(Guid borrowId )
         {
             try{
@@ -229,6 +238,18 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(new { message = e.Message });
             }
         }
-
+        [HttpGet]
+        [Route("return-req")]
+        public async Task<IActionResult> GetReturnBorrowsAsync()
+        {
+            try
+            {
+                var borrowList = await _borrowService.GetReturnBorrowsAsync();
+                return Ok(borrowList);
+            }catch(Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
     }
 }

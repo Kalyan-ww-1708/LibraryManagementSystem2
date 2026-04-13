@@ -25,7 +25,7 @@ namespace LibraryManagementSystem.Repository
 
         public async Task<List<Book>> GetAllAsync()
         {
-            return await _dbContext.Books.ToListAsync();
+            return await _dbContext.Books.Include(b=>b.Categories).ToListAsync();
         }
 
         public async Task<List<Book>> GetByCategoryAsync(Guid categoryId)
@@ -58,7 +58,6 @@ namespace LibraryManagementSystem.Repository
             _dbContext.Books.Update(book);
             await Task.CompletedTask; 
         }
-
         public async Task<Book?> GetBookByTitleAsync(string bookTitle) {
 
             return await _dbContext.Books.FirstOrDefaultAsync(b => b.BookTitle == bookTitle);

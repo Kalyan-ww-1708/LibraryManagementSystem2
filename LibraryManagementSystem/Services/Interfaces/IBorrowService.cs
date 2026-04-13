@@ -9,6 +9,7 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<List<Borrow>> GetBorrowList(); //Good
         Task<Borrow> GetBorrowWithId(Guid borrowId);
         Task<List<Borrow>> GetBorrowListByBookId(Guid bookId); //Good
+        Task<List<Borrow>> GetRecentBorrow();
         Task<Borrow> CreateBorrow(CreateBorrowDto dto);
 
         Task<Borrow?> AddReturnDate(Guid borrowId,UpdateBorrowDto dto);
@@ -22,7 +23,9 @@ namespace LibraryManagementSystem.Services.Interfaces
         Task<byte[]> DownloadBorrowList();
         Task<int> GetBorrowCount();
         Task<List<Borrow>> BorrowListForApprovals();
-      
+        Task<List<Borrow>> GetReturnBorrowsAsync();
+
+
 
     }
 }

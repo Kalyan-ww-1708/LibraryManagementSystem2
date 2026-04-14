@@ -9,6 +9,8 @@ namespace LibraryManagementSystem.Repository
         Task<List<Borrow>> GetAllAsync();
         Task<Borrow?> GetByIdAsync(Guid borrowId);
 
+        Task<List<Borrow>> GetRecentList();
+
         Task AddAsync(Borrow borrow);
         Task UpdateAsync(Borrow borrow);
         Task DeleteAsync(Borrow borrow);
@@ -17,6 +19,7 @@ namespace LibraryManagementSystem.Repository
 
         Task<List<Borrow>> GetByUserIdAsync(Guid userId);
         Task<List<Borrow>> GetByBookIdAsync(Guid bookId);
+        Task<List<Borrow>> GetLimitedAsync(int limit);
 
         Task<User?> GetUserByUserId(Guid userId);
         Task<Book?> GetBookByBookId(Guid bookId);
@@ -27,6 +30,8 @@ namespace LibraryManagementSystem.Repository
         Task<int> GetCountAsync();
         Task<List<BorrowDetailsDto>> GetCustomBorrowDetailsAsync();
         Task<List<Borrow>> GetApprovalBorrowsAsync();
+
+        Task<List<Borrow>> GetReturnBorrowsAsync();
 
 
         

@@ -1,4 +1,4 @@
-﻿
+﻿    
 using LibraryManagementSystem.Context;
 using LibraryManagementSystem.Dtos.BookDto;
 using LibraryManagementSystem.Model;
@@ -35,7 +35,6 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
-
         [HttpGet]
         [Route("li/{limit:int}")]
         public async Task<IActionResult> getLimitedBooks(int limit)
@@ -92,11 +91,16 @@ namespace LibraryManagementSystem.Controllers
                 if (NewBook is null) 
                     return NotFound("Can't create the request please try again");
                 return Ok(NewBook);
-            }catch(Exception e)
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
-            
+
         }
 
 

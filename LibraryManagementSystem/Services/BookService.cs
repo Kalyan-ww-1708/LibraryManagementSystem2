@@ -22,6 +22,15 @@ namespace LibraryManagementSystem.Services
         }
 
         public async Task<Book?> CreateBook(CreateBookDto newBook){
+            var exist =await  _bookRepository.GetBookByTitleAsync(newBook.BookTitle);
+            if (exist != null)
+            {
+                throw new ConflictException("Book already Exist with Same Title Please Verify");
+            }
+            if (newBook.TotalCopies < newBook.AvailableCopies)
+            {
+                throw new InValidException("Available copies cannot exceed total copies");
+            }
             var book = new Book(){
                 Id = Guid.NewGuid(),
                 BookTitle = newBook.BookTitle,
@@ -32,9 +41,7 @@ namespace LibraryManagementSystem.Services
                 TotalCopies = newBook.TotalCopies,
                 ImageUrl = newBook.ImageUrl
             };
-            if (newBook.TotalCopies < newBook.AvailableCopies){
-                throw new InValidException("Available copies cannot exceed total copies");
-            }
+            
             await _bookRepository.AddAsync(book);
             await _bookRepository.SaveChangesAsync();
 

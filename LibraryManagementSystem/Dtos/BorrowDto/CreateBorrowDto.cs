@@ -6,14 +6,11 @@ namespace LibraryManagementSystem.Dtos.BorrowDto
     {
         [Required(ErrorMessage = "Can't make borrow request without a BookId")]
         public Guid BookId { get; set; }
-
         [Required(ErrorMessage = "Can't make borrow request without a UserId")]
         public Guid UserId { get; set; }
-
-        [Required(ErrorMessage = "Borrow Date Can't be empty")]
+        [Required(ErrorMessage = "Can't make borrow request without a BorroDate")]
         public DateTime BorrowDate { get; set; }
-
-        [Required(ErrorMessage = "Due Date Can't be empty")]
+        [Required(ErrorMessage = "Can't make borrow request without a DueDate")]
         public DateTime DueDate { get; set; }
     }
 }

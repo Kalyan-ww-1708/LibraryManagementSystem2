@@ -19,7 +19,10 @@ namespace LibraryManagementSystem.Repository
         {
             return await _dbContext.Borrows.Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
-
+        public async Task<List<Borrow>> GetLimitedAsync(int limit)
+        {
+            return await _dbContext.Borrows.Take(limit).ToListAsync();
+        }
         public async Task<Borrow?> GetByIdAsync(Guid borrowId)
         {
             return await _dbContext.Borrows.Include(b => b.Book).Include(b => b.User).FirstOrDefaultAsync(b => b.BorrowId == borrowId);
@@ -47,7 +50,7 @@ namespace LibraryManagementSystem.Repository
         }
         public async Task<List<Borrow>> GetByUserIdAsync(Guid userId)
         {
-            return await _dbContext.Borrows.Where(b => b.UserId == userId).ToListAsync();
+            return await _dbContext.Borrows.Where(b => b.UserId == userId).Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
 
         public async Task<List<Borrow>> GetByBookIdAsync(Guid bookId)
@@ -95,8 +98,8 @@ namespace LibraryManagementSystem.Repository
                 BookTitle = b.Book!.BookTitle,
                 UserName = b.User!.UserName,
                 PhoneNumber = b.User.PhoneNumber,
-                BorrowDate = b.BorrowDate,
-                DueDate = b.DueDate,
+                BorrowDate = (DateTime)b.BorrowDate,
+                DueDate = (DateTime)(b.DueDate),
                 ReturnDate = b.ReturnDate
             }).ToListAsync();
         }
@@ -104,6 +107,13 @@ namespace LibraryManagementSystem.Repository
         public async Task<List<Borrow>> GetApprovalBorrowsAsync()
         {
             return await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).ToListAsync();
+        }
+        public async Task<List<Borrow>> GetReturnBorrowsAsync(){ 
+            return await _dbContext.Borrows.Where(b=>b.Status == "Returned Raised").Include(b => b.Book).Include(b => b.User).ToListAsync();
+        }
+        public async Task<List<Borrow>> GetRecentList()
+        {
+            return await _dbContext.Borrows.OrderByDescending(b => b.StatusUpdatedAt).Take(10).Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
     }
 }

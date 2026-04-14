@@ -1,11 +1,11 @@
-﻿using LibraryManagementSystem.Context;
-using LibraryManagementSystem.Dtos.BorrowDto;
-using LibraryManagementSystem.Dtos.UserDto;
-using LibraryManagementSystem.Model;
-using LibraryManagementSystem.Repository;
-using LibraryManagementSystem.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
+﻿    using LibraryManagementSystem.Context;
+    using LibraryManagementSystem.Dtos.BorrowDto;
+    using LibraryManagementSystem.Dtos.UserDto;
+    using LibraryManagementSystem.Model;
+    using LibraryManagementSystem.Repository;
+    using LibraryManagementSystem.Services.Interfaces;
+    using Microsoft.EntityFrameworkCore;
+    using OfficeOpenXml;
 
 
 namespace LibraryManagementSystem.Services
@@ -17,23 +17,87 @@ namespace LibraryManagementSystem.Services
         {
             _borrowRepository = borrowRepository;
         }
-        public async Task<List<Borrow>> GetBorrowList()
+        public async Task<List<BorrowDetailsDto>> GetBorrowList()
         {
-            var borrows = await _borrowRepository.GetAllAsync();
-            return borrows;
+            var borrowList = await _borrowRepository.GetAllAsync();
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                BorrowDate = b.BorrowDate,
+                DueDate = b.DueDate,
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
         }
-        public async Task<List<Borrow>> GetBorrowListByUserId(Guid userId)
+        public async Task<List<BorrowDetailsDto>> GetLimitedBorrowsAsync(int limit)
+        {
+            var borrowList = await _borrowRepository.GetLimitedAsync(limit);
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                BorrowDate = b.BorrowDate,
+                DueDate = b.DueDate,
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
+        }
+        public async Task<Borrow> GetBorrowWithId(Guid borrowId)
+        {
+            var borrow = await _borrowRepository.GetByIdAsync(borrowId);
+            return borrow;
+        }
+        public async Task<List<BorrowDetailsDto>> GetBorrowListByUserId(Guid userId)
         {
 
             var borrowList = await _borrowRepository.GetByUserIdAsync(userId);
-            return borrowList;
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                BorrowDate = b.BorrowDate,
+                DueDate = b.DueDate,
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
         }
-        public async Task<List<Borrow>> GetBorrowListByBookId(Guid bookId)
+        public async Task<List<BorrowDetailsDto>> GetBorrowListByBookId(Guid bookId)
         {
             var borrowList = await _borrowRepository.GetByBookIdAsync(bookId);
-            return borrowList;
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                BorrowDate = b.BorrowDate,
+                DueDate = b.DueDate,
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
         }
-
+        public async Task<List<BorrowDetailsDto>> GetRecentBorrow()
+        {
+            var borrowList = await _borrowRepository.GetRecentList();
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                BorrowDate = b.BorrowDate,
+                DueDate = b.DueDate,
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
+        }
 
         public async Task<Borrow> CreateBorrow(CreateBorrowDto dto)
         {
@@ -50,7 +114,8 @@ namespace LibraryManagementSystem.Services
             if (exist)
                 throw new InValidException("Multiple books can't be taken");
 
-            var borrow = new Borrow{
+            var borrow = new Borrow
+            {
                 BookId = dto.BookId,
                 UserId = dto.UserId,
                 BorrowDate = dto.BorrowDate,
@@ -58,7 +123,7 @@ namespace LibraryManagementSystem.Services
                 Book = book,
                 User = user,
             };
-
+   
             await _borrowRepository.AddAsync(borrow);
             await _borrowRepository.SaveChangesAsync();
             return borrow;
@@ -78,16 +143,27 @@ namespace LibraryManagementSystem.Services
             await _borrowRepository.SaveChangesAsync();
             return borrow.Status;
         }
-        public async Task<List<Borrow>> BorrowListForApprovals()
+        public async Task<List<BorrowDetailsDto>> BorrowListForApprovals()
         {
-            var borrows = await _borrowRepository.GetApprovalBorrowsAsync();
-            return borrows;
+            var borrowList = await _borrowRepository.GetApprovalBorrowsAsync();
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                BorrowDate = b.BorrowDate,
+                DueDate = b.DueDate,
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
+
         }
-        
+
         public async Task<string> RejectBorrowRequest(Guid borrowId)
         {
             var borrow = await _borrowRepository.GetByIdAsync(borrowId);
-            if(borrow == null)
+            if (borrow == null)
                 throw new NotFoundException("Request Not found");
             if (borrow.Status != "Pending")
                 throw new InValidException("Only pending requests can be approved");
@@ -101,7 +177,7 @@ namespace LibraryManagementSystem.Services
             var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             if (borrow == null)
                 throw new NotFoundException("Request Not found");
-            if (borrow.Status == "Returned"|| borrow.Status ==  "Pending" || borrow.Status == "Rejected")
+            if (borrow.Status == "Returned" || borrow.Status == "Pending" || borrow.Status == "Rejected")
                 throw new InValidException("Invalid Borrow Please Try Again");
             borrow.Status = "Returned";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
@@ -116,7 +192,7 @@ namespace LibraryManagementSystem.Services
             if (borrow.ReturnDate != null)
                 throw new Exception("Book already returned");
             borrow.ReturnDate = dto.ReturnDate;
-            borrow.Status = "Returned Raised";
+            borrow.Status = "Return Raised";
             await _borrowRepository.SaveChangesAsync();
             return borrow;
         }
@@ -130,7 +206,21 @@ namespace LibraryManagementSystem.Services
             await _borrowRepository.SaveChangesAsync();
             return borrow;
         }
-       
+        public async Task<List<BorrowDetailsDto>> GetReturnBorrowsAsync()
+        {
+            var borrowList = await _borrowRepository.GetReturnBorrowsAsync();
+            return borrowList.Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                UserName = b.User != null ? b.User.UserName : "Unknown",
+                Email = b.User != null ? b.User.Email : null,
+                BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                Status = b.Status,
+                StatusUpdatedAt = b.StatusUpdatedAt
+            }).ToList();
+        }
+
+
         public async Task<byte[]> DownloadBorrowList()
         {
             var borrowList = await _borrowRepository.GetAllAsync();
@@ -174,7 +264,7 @@ namespace LibraryManagementSystem.Services
         {
             return await _borrowRepository.GetCountAsync();
         }
-    }
 
 
     }
+}

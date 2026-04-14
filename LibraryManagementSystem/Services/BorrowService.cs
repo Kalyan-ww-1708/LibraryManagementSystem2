@@ -181,6 +181,7 @@ namespace LibraryManagementSystem.Services
                 throw new InValidException("Invalid Borrow Please Try Again");
             borrow.Status = "Returned";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
+            borrow.Book!.AvailableCopies++;
             await _borrowRepository.SaveChangesAsync();
             return "Successfully Returned";
         }

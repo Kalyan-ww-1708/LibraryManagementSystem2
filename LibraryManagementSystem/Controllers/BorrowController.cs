@@ -33,6 +33,24 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet("li/{limit:int}")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetBorrowList(int limit)
+        {
+            try
+            {
+                var borrowList = await _borrowService.GetLimitedBorrowsAsync(limit);
+                return Ok(borrowList);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
         [HttpGet]
         [Route("b/{borrowId:guid}")]
@@ -107,9 +125,10 @@ namespace LibraryManagementSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBorrow(CreateBorrowDto dto)
+        public async Task<IActionResult> CreateBorrow([FromBody] CreateBorrowDto dto)
         {
             try{
+                //Console.WriteLine($"BorrowDate: {dto.BorrowDate}, DueDate: {dto.DueDate}");
                 var borrow = await _borrowService.CreateBorrow(dto);
                 return Ok(borrow);
             }
@@ -123,7 +142,6 @@ namespace LibraryManagementSystem.Controllers
                 return BadRequest(e.Message);
             }
         }
-
         [HttpPatch]
         [Route("updateborrow/{borrowId:guid}")]
         public async Task<IActionResult> AddReturnDate(Guid borrowId, [FromBody] UpdateBorrowDto dto)

@@ -6,15 +6,16 @@ namespace LibraryManagementSystem.Services.Interfaces
 {
     public interface IBorrowService
     {
-        Task<List<Borrow>> GetBorrowList(); //Good
+        Task<List<BorrowDetailsDto>> GetBorrowList(); //Good
+        Task<List<BorrowDetailsDto>> GetLimitedBorrowsAsync(int limit);
         Task<Borrow> GetBorrowWithId(Guid borrowId);
-        Task<List<Borrow>> GetBorrowListByBookId(Guid bookId); //Good
-        Task<List<Borrow>> GetRecentBorrow();
+        Task<List<BorrowDetailsDto>> GetBorrowListByBookId(Guid bookId); //Good
+        Task<List<BorrowDetailsDto>> GetRecentBorrow();
         Task<Borrow> CreateBorrow(CreateBorrowDto dto);
 
         Task<Borrow?> AddReturnDate(Guid borrowId,UpdateBorrowDto dto);
         Task<Borrow?> ExtendDueDate(Guid borrowId, UpdateBorrowDto dto);
-        Task<List<Borrow>> GetBorrowListByUserId(Guid  UserId);
+        Task<List<BorrowDetailsDto>> GetBorrowListByUserId(Guid  UserId);
 
         Task<string> ApproveBorrowRequest(Guid borrowId);
         Task<string> RejectBorrowRequest(Guid borrowId);
@@ -22,10 +23,7 @@ namespace LibraryManagementSystem.Services.Interfaces
 
         Task<byte[]> DownloadBorrowList();
         Task<int> GetBorrowCount();
-        Task<List<Borrow>> BorrowListForApprovals();
-        Task<List<Borrow>> GetReturnBorrowsAsync();
-
-
-
+        Task<List<BorrowDetailsDto>> BorrowListForApprovals();
+        Task<List<BorrowDetailsDto>> GetReturnBorrowsAsync();
     }
 }

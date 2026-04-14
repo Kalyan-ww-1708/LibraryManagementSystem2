@@ -19,6 +19,7 @@ namespace LibraryManagementSystem.Repository
 
         Task<List<Borrow>> GetByUserIdAsync(Guid userId);
         Task<List<Borrow>> GetByBookIdAsync(Guid bookId);
+        Task<List<Borrow>> GetLimitedAsync(int limit);
 
         Task<User?> GetUserByUserId(Guid userId);
         Task<Book?> GetBookByBookId(Guid bookId);

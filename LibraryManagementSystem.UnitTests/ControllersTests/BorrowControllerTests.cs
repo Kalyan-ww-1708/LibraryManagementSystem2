@@ -24,7 +24,7 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
         public async Task GetBorrowList_ShouldReturnOk()
         {
             _mockService.Setup(s => s.GetBorrowList())
-                        .ReturnsAsync(new List<Borrow> { new Borrow() });
+                        .ReturnsAsync(new List<BorrowDetailsDto> { new BorrowDetailsDto() });
 
             var result = await _controller.GetBorrowList();
 
@@ -59,7 +59,7 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
         public async Task GetBorrowListByBookId_ShouldReturnOk()
         {
             _mockService.Setup(s => s.GetBorrowListByBookId(It.IsAny<Guid>()))
-                        .ReturnsAsync(new List<Borrow> { new Borrow() });
+                        .ReturnsAsync(new List<BorrowDetailsDto> { new BorrowDetailsDto() });
 
             var result = await _controller.GetBorrowListByBookId(Guid.NewGuid());
 
@@ -70,7 +70,8 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
         public async Task GetBorrowListByUserId_ShouldReturnOk()
         {
             _mockService.Setup(s => s.GetBorrowListByUserId(It.IsAny<Guid>()))
-                        .ReturnsAsync(new List<Borrow> { new Borrow() });
+                .ReturnsAsync(new List<BorrowDetailsDto> { new BorrowDetailsDto() });
+
 
             var result = await _controller.GetBorrowListByUserId(Guid.NewGuid());
 
@@ -150,7 +151,7 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
         public async Task BorrowListForApprovals_ShouldReturnOk()
         {
             _mockService.Setup(s => s.BorrowListForApprovals())
-                        .ReturnsAsync(new List<Borrow>());
+                        .ReturnsAsync(new List<CreateBorrowDto> { new CreateBorrowDto() });
 
             var result = await _controller.BorrowListForApprovals();
 

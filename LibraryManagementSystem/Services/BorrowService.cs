@@ -111,9 +111,8 @@ namespace LibraryManagementSystem.Services
             if (book.AvailableCopies <= 0)
                 throw new InValidException("Book is currently unavailable");
             var exist = await _borrowRepository.ExistanceAsync(dto.UserId, dto.BookId);
-            if (exist)
+            if (exist != null && exist.Status != "Returned")
                 throw new InValidException("Multiple books can't be taken");
-
             var borrow = new Borrow
             {
                 BookId = dto.BookId,
@@ -179,6 +178,7 @@ namespace LibraryManagementSystem.Services
                 throw new NotFoundException("Request Not found");
             if (borrow.Status == "Returned" || borrow.Status == "Pending" || borrow.Status == "Rejected")
                 throw new InValidException("Invalid Borrow Please Try Again");
+            borrow.Book!.AvailableCopies++;
             borrow.Status = "Returned";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
             await _borrowRepository.SaveChangesAsync();

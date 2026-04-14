@@ -79,11 +79,18 @@ namespace LibraryManagementSystem.Repository
                 }).ToListAsync();
         }
         //for Multiple books
-        public async Task<bool> ExistanceAsync(Guid userId, Guid bookId)
+        public async Task<BorrowDetailsDto?> ExistanceAsync(Guid userId, Guid bookId)
         {
-            return await _dbContext.Borrows.AnyAsync(b => b.UserId == userId && b.BookId == bookId);
+            return await _dbContext.Borrows.Where(b => b.UserId == userId && b.BookId == bookId).Select(b => new BorrowDetailsDto{
+            BorrowId = b.BorrowId,
+                BookTitle = b.Book!.BookTitle,
+                UserName = b.User!.UserName,
+                PhoneNumber = b.User.PhoneNumber,
+                BorrowDate = (DateTime)b.BorrowDate,
+                DueDate = (DateTime)b.DueDate,
+                Status = b.Status,
+                ReturnDate = b.ReturnDate}).FirstOrDefaultAsync();
         }
-
         public async Task<int> GetCountAsync()
         {
             return await _dbContext.Borrows.Where(u => u.Status == "Approved").CountAsync();
@@ -109,7 +116,7 @@ namespace LibraryManagementSystem.Repository
             return await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
         public async Task<List<Borrow>> GetReturnBorrowsAsync(){ 
-            return await _dbContext.Borrows.Where(b=>b.Status == "Returned Raised").Include(b => b.Book).Include(b => b.User).ToListAsync();
+            return await _dbContext.Borrows.Where(b=>b.Status == "Return Raised").Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
         public async Task<List<Borrow>> GetRecentList()
         {

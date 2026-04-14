@@ -25,7 +25,7 @@ namespace LibraryManagementSystem.Repository
         Task<Book?> GetBookByBookId(Guid bookId);
 
         Task<List<UserLoginResponseDto>> GetBorrowUsersByBookIdAsync(Guid bookId);
-        Task<bool> ExistanceAsync(Guid userId, Guid bookId);
+        Task<BorrowDetailsDto?> ExistanceAsync(Guid userId, Guid bookId);
 
         Task<int> GetCountAsync();
         Task<List<BorrowDetailsDto>> GetCustomBorrowDetailsAsync();

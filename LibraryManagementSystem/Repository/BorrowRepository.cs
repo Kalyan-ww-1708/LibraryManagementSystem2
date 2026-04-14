@@ -109,7 +109,7 @@ namespace LibraryManagementSystem.Repository
             return await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
         public async Task<List<Borrow>> GetReturnBorrowsAsync(){ 
-            return await _dbContext.Borrows.Where(b=>b.Status == "Returned Raised").Include(b => b.Book).Include(b => b.User).ToListAsync();
+            return await _dbContext.Borrows.Where(b=>b.Status == "Return Raised").Include(b => b.Book).Include(b => b.User).ToListAsync();
         }
         public async Task<List<Borrow>> GetRecentList()
         {

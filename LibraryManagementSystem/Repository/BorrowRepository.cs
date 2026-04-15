@@ -79,9 +79,14 @@ namespace LibraryManagementSystem.Repository
                 }).ToListAsync();
         }
         //for Multiple books
-        public async Task<bool> ExistanceAsync(Guid userId, Guid bookId)
+        public async Task<BorrowDetailsDto?> ExistanceAsync(Guid userId, Guid bookId)
         {
-            return await _dbContext.Borrows.AnyAsync(b => b.UserId == userId && b.BookId == bookId);
+            return await _dbContext.Borrows.Where(b => b.UserId == userId && b.BookId == bookId).Select(b => new BorrowDetailsDto
+            {
+                BorrowId = b.BorrowId,
+                Status = b.Status
+            })
+        .FirstOrDefaultAsync();
         }
 
         public async Task<int> GetCountAsync()

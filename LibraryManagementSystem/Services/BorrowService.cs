@@ -26,6 +26,7 @@ namespace LibraryManagementSystem.Services
                 UserName = b.User != null ? b.User.UserName : "Unknown",
                 Email = b.User != null ? b.User.Email : null,
                 BookTitle = b.Book != null ? b.Book.BookTitle : "Unknown",
+                PhoneNumber = b.User != null ? b.User.PhoneNumber : "Unknown",
                 BorrowDate = b.BorrowDate,
                 DueDate = b.DueDate,
                 Status = b.Status,
@@ -111,7 +112,7 @@ namespace LibraryManagementSystem.Services
             if (book.AvailableCopies <= 0)
                 throw new InValidException("Book is currently unavailable");
             var exist = await _borrowRepository.ExistanceAsync(dto.UserId, dto.BookId);
-            if (exist)
+            if (exist!= null && exist.Status != "Returned")
                 throw new InValidException("Multiple books can't be taken");
 
             var borrow = new Borrow

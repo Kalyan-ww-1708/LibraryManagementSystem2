@@ -26,10 +26,10 @@ namespace LibraryManagementSystem.Controllers
                 return Ok(admin);
             }
             catch(ConflictException e){
-                return Conflict(new { message = e.Message });
+                return Conflict(e.Message);
             }
             catch(Exception e){
-                return BadRequest(new { message = e.Message });
+                return BadRequest(e.Message);
             }
         }
 
@@ -42,10 +42,10 @@ namespace LibraryManagementSystem.Controllers
                 return Ok(admin);
             }
             catch (NotFoundException e){
-                return NotFound(new { message = e.Message });
+                return NotFound(e.Message);
             }
             catch (Exception e){
-                return BadRequest(new { message = e.Message });
+                return BadRequest(e.Message);
             }
         }
 
@@ -57,10 +57,10 @@ namespace LibraryManagementSystem.Controllers
                 var admin = await _adminService.TfaAdmin(dto);
                 return Ok(admin);
             }catch (UnauthorizedException e){
-                return Unauthorized(new { message = e.Message });
+                return Unauthorized(e.Message);
             }
             catch (Exception e){
-                return BadRequest(new { message = e.Message });
+                return BadRequest(e.Message);
             }
         }
     }

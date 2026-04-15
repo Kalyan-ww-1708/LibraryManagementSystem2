@@ -12,12 +12,14 @@ namespace LibraryManagementSystem.Services
         private readonly ITokenService _tokenService;
         private readonly IOtpService _otpService;
         private readonly IEmailService _emailService;
-        public AdminService(ApplicationDbContext DbContext, ITokenService tokenService, IOtpService otpService, IEmailService emailService)
+        private readonly IPasswordService _passwordService;
+        public AdminService(ApplicationDbContext DbContext, ITokenService tokenService, IOtpService otpService, IEmailService emailService, IPasswordService passwordService)
         {
             _dbContext = DbContext;
             _tokenService = tokenService;
             _otpService = otpService;
             _emailService = emailService;
+            _passwordService = passwordService;
 
         }
 
@@ -25,32 +27,30 @@ namespace LibraryManagementSystem.Services
         {
             //Check Admin Name also along with Email
             var exist = await _dbContext.Admins.FirstOrDefaultAsync(u =>
-            u.Email == dto.Email ||
-            u.AdminName == dto.AdminName);
+            u.Email == dto.Email ||u.AdminName == dto.AdminName);
             if (exist !=null)
                 throw new ConflictException("Admin Already Exist");
+            var hashedPassword = _passwordService.HashPassword(dto.Password);
             var admin = new Admin(){
                 AdminId = Guid.NewGuid(),
                 AdminName = dto.AdminName,
                 Email = dto.Email,
-                Password = dto.Password,
+                Password = hashedPassword,
             };
             await _dbContext.Admins.AddAsync(admin);
             await _dbContext.SaveChangesAsync();
 
             return admin;
-        
         }
         public async Task<string?> LoginAdmin(LoginDto dto)
         {
-            var admin = await _dbContext.Admins.FirstOrDefaultAsync(a =>
-                    a.Email == dto.Identifier ||
+            var admin = await _dbContext.Admins.FirstOrDefaultAsync(a =>a.Email == dto.Identifier ||
                     a.AdminName == dto.Identifier);
 
             if (admin == null)
                 throw new NotFoundException("Admin Not Found");
 
-            if (dto.Password != admin.Password)
+            if (!_passwordService.VerifyPassword(dto.Password,admin.Password))
                 throw new UnauthorizedException("Invalid Credentials");
 
             admin.Otp = _otpService.GenerateOtp();

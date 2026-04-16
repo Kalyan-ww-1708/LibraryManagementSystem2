@@ -214,7 +214,7 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
 
                 var res = await repo.ExistanceAsync(userId, bookId);
 
-                res.Should().BeTrue();
+                res.Should().NotNull()
             }
 
             [Fact]

@@ -344,8 +344,8 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
             var dbContext = GetDbContext();
             var repo = new BorrowRepository(dbContext);
 
-            var book = new Book { Id = Guid.NewGuid(), BookTitle = "Test" };
-            var user = new User { UserId = Guid.NewGuid(), UserName = "User1" };
+            var book = new Book { Id = Guid.NewGuid(), BookTitle = "Delete Me", Author = "Author", Description = "Hello hi", Isbn = "333", AvailableCopies = 1, TotalCopies = 2 };
+            var user = new User { UserId = Guid.NewGuid(), UserName = "User1", Email = "a@gmail.com", PhoneNumber = "123",Password="Hello" };
 
             var borrow = new Borrow
             {
@@ -468,7 +468,7 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
             var dbContext = GetDbContext();
             var repo = new BorrowRepository(dbContext);
 
-            var book = new Book { Id = Guid.NewGuid(), BookTitle = "Test" };
+            var book = new Book { Id = Guid.NewGuid(), BookTitle = "Delete Me", Author = "Author", Description = "Hello hi", Isbn = "333", AvailableCopies = 1, TotalCopies = 2 };
 
             await dbContext.Books.AddAsync(book);
             await dbContext.SaveChangesAsync();
@@ -484,7 +484,7 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
             var dbContext = GetDbContext();
             var repo = new BorrowRepository(dbContext);
 
-            var user = new User { UserId = Guid.NewGuid(), UserName = "User1" };
+            var user = new User { UserId = Guid.NewGuid(), UserName = "User1", Email = "a@gmail.com", PhoneNumber = "123", Password = "Hello" };
 
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
@@ -503,7 +503,6 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
             var userId = Guid.NewGuid();
             var bookId = Guid.NewGuid();
 
-<<<<<<< HEAD
                 await dbContext.Borrows.AddAsync(new Borrow
                 {
                     BorrowId = Guid.NewGuid(),
@@ -515,27 +514,32 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
 
                 var res = await repo.ExistanceAsync(userId, bookId);
 
-                res.Should().NotNull()
+            res.Should().NotBeNull();
             }
 
-            [Fact]
-            public async Task GetCountAsync_ShouldReturnApprovedCount()
-=======
-            await dbContext.Borrows.AddAsync(new Borrow
->>>>>>> 91656d1 (Updated Test File)
-            {
-                BorrowId = Guid.NewGuid(),
-                UserId = userId,
-                BookId = bookId,
-                Status = "Pending"
-            });
+//            [Fact]
+//            public async Task GetCountAsync_ShouldReturnApprovedCount() {
 
-            await dbContext.SaveChangesAsync();
+//            var dbContext = GetDbContext();
+//            var repo = new BorrowRepository(dbContext);
 
-            var res = await repo.ExistanceAsync(userId, bookId);
+//            var Id = Guid.NewGuid();
+//            var UserId = Guid.NewGuid();
 
-            res.Should().NotBeNull(); // ✅ FIXED
-        }
+//            await dbContext.Borrows.AddAsync(new Borrow
+//{
+//                BorrowId = Guid.NewGuid(),
+//                UserId = UserId,
+//                BookId = Id,
+//                Status = "Pending"
+//            });
+
+//            await dbContext.SaveChangesAsync();
+
+//            var res = await repo.ExistanceAsync(UserId, Id);
+
+//            res.Should().NotBeNull();
+//        }
 
         [Fact]
         public async Task GetCountAsync_ShouldReturnApprovedCount()
@@ -568,7 +572,8 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
                 UserId = Guid.NewGuid(),
                 UserName = "User1",
                 Email = "test@gmail.com",
-                PhoneNumber = "999"
+                PhoneNumber = "999",
+                Password = "Testttt"
             };
 
             var borrow = new Borrow
@@ -593,8 +598,9 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
             var dbContext = GetDbContext();
             var repo = new BorrowRepository(dbContext);
 
-            var book = new Book { Id = Guid.NewGuid(), BookTitle = "Test" };
-            var user = new User { UserId = Guid.NewGuid(), UserName = "User1" };
+            var book = new Book { Id = Guid.NewGuid(), BookTitle = "Delete Me", Author = "Author", Description = "Hello hi", Isbn = "333", AvailableCopies = 1, TotalCopies = 2 };
+            var user = new User { UserId = Guid.NewGuid(), UserName = "User1", Email = "a@gmail.com", PhoneNumber = "123", Password = "Hello" };
+
 
             var borrow = new Borrow
             {
@@ -630,7 +636,7 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
 
             var res = await repo.GetApprovalBorrowsAsync();
 
-            res.Should().HaveCount(1); // ✅ FIXED
+            res.Should().HaveCount(1);
         }
     }
 }

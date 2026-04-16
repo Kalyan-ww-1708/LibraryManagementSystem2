@@ -151,7 +151,7 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
         public async Task BorrowListForApprovals_ShouldReturnOk()
         {
             _mockService.Setup(s => s.BorrowListForApprovals())
-                        .ReturnsAsync(new List<CreateBorrowDto> { new CreateBorrowDto() });
+                        .ReturnsAsync(new List<BorrowDetailsDto> { new BorrowDetailsDto() });
 
             var result = await _controller.BorrowListForApprovals();
 

@@ -1,6 +1,4 @@
 <Solution>
-  <Project Path="LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj">
-    <Build Solution="Debug|*" Project="false" />
-  </Project>
+  <Project Path="LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj" />
   <Project Path="LibraryManagementSystem/LibraryManagementSystem.csproj" />
 </Solution>

@@ -102,7 +102,7 @@ namespace LibraryManagementSystem.Controllers
         }
         [HttpGet]
         [Route("count")]
-        public async Task<IActionResult> GetBooksCount()
+        public async Task<IActionResult> GetBorrowCount()
         {
             try{
                 var count = await _borrowService.GetBorrowCount();

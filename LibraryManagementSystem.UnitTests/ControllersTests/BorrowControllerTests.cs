@@ -84,7 +84,7 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
             _mockService.Setup(s => s.GetBorrowCount())
                         .ReturnsAsync(5);
 
-            var result = await _controller.GetBooksCount();
+            var result = await _controller.GetBorrowCount();
 
             var ok = result as OkObjectResult;
             ok!.Value.Should().Be(5);

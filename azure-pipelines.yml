@@ -1,0 +1,55 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- v3.0
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+  appName: 'LibraryManagement-backend'   # Your Azure App Service Name
+  projectPath: 'LibraryManagementSystem/LibraryManagementSystem.csproj'
+
+steps:
+
+# Install .NET SDK
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '10.0.x'
+
+# Restore Dependencies
+- script: dotnet restore
+  displayName: 'Restore NuGet Packages'
+
+# Build Project
+- script: dotnet build --configuration $(buildConfiguration) --no-restore
+  displayName: 'Build Project'
+
+# Run Unit Tests
+- script: dotnet test --no-build --verbosity normal
+  displayName: 'Run Unit Tests'
+
+# Publish Project
+- script: dotnet publish $(projectPath) --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+  displayName: 'Publish Project'
+
+# Publish Artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop'
+
+# Deploy to Azure App Service
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure App Service'
+  inputs:
+    azureSubscription: 'backend_server_connection'  # Replace this
+    appName: '$(appName)'
+    package: '$(Build.ArtifactStagingDirectory)'

@@ -7,7 +7,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  solution: 'LibraryManagementSystem.sln'
+  solution: 'LibraryManagementSystem.slnx'
   projectPath: 'LibraryManagementSystem/LibraryManagementSystem.csproj'
   appName: 'LibraryManagement-backend'
 
@@ -29,7 +29,7 @@ steps:
   displayName: 'Build Solution'
 
 # Run Unit Tests
-- script: dotnet test $(solution) --no-build --verbosity normal
+- script: dotnet test  --no-build --verbosity normal
   displayName: 'Run Unit Tests'
 
 # Publish Backend Project

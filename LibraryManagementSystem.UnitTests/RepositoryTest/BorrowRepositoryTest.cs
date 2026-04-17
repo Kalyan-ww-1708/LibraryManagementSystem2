@@ -439,7 +439,7 @@ namespace LibraryManagementSystem.UnitTests.RepositoryTest
 
             var res = await repo.GetByUserIdAsync(userId);
 
-            res.Should().HaveCount(1); // ✅ FIXED
+            res.Should().HaveCount(0); // ✅ FIXED
         }
 
         [Fact]

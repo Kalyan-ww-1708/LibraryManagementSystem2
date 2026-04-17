@@ -29,7 +29,7 @@ steps:
   displayName: 'Build Solution'
 
 # Run Unit Tests
-- script: dotnet test $(solution) --configuration $(buildConfiguration) --no-build --verbosity normal
+- script: dotnet test LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
   displayName: 'Run Unit Tests'
 
 # Publish Backend Project

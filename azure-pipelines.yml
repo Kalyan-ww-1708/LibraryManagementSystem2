@@ -62,7 +62,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  solution: 'LibraryManagementSystem.sln'
+  solution: 'LibraryManagementSystem.slnx'
   projectPath: 'LibraryManagementSystem/LibraryManagementSystem.csproj'
   appName: 'LibraryManagement-backend'
 

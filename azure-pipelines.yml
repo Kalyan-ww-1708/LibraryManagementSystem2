@@ -1,0 +1,45 @@
+
+trigger:
+- prod   # Yes, this is your branch
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+  solution: 'LibraryManagementSystem.slnx'
+  projectPath: 'LibraryManagementSystem/LibraryManagementSystem.csproj'
+  appName: 'LibraryManagement-backend'
+
+steps:
+
+# Install .NET SDK (Use stable version)
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '10.0.x'
+
+# Restore ALL projects (IMPORTANT FIX)
+- script: dotnet restore $(solution)
+  displayName: 'Restore NuGet Packages'
+
+# Build solution
+- script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
+  displayName: 'Build Solution'
+
+# Run Unit Tests
+- script: dotnet test $(solution) --no-build --verbosity normal
+  displayName: 'Run Unit Tests'
+
+# Publish Backend Project
+- script: dotnet publish $(projectPath) --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+  displayName: 'Publish Project'
+
+# Deploy directly (artifact step optional)
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure App Service'
+  inputs:
+    azureSubscription: 'backend_server_connection'
+    appName: '$(appName)'
+    package: '$(Build.ArtifactStagingDirectory)'

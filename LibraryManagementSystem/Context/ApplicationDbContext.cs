@@ -21,5 +21,6 @@ namespace LibraryManagementSystem.Context
 
         public DbSet<Admin> Admins { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

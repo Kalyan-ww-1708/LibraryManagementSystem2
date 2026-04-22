@@ -88,10 +88,10 @@ namespace LibraryManagementSystem.Controllers
 
         [HttpGet]
         [Route("user/{userId:guid}")]
-        public async Task<IActionResult> GetBorrowListByUserId(Guid userId)
+        public async Task<IActionResult> GetBorrowListByUserId(Guid userId, int pageNumber, int pageSize)
         {
             try{
-                var borrowList = await  _borrowService.GetBorrowListByUserId(userId);
+                var borrowList = await  _borrowService.GetBorrowListByUserId(userId,pageNumber,pageSize);
                 if (borrowList is null)
                     return NotFound("No borrowList is Found for this book");
                 return Ok(borrowList);

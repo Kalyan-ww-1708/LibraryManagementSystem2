@@ -17,7 +17,7 @@ namespace LibraryManagementSystem.Repository
         Task SaveChangesAsync();
 
 
-        Task<List<Borrow>> GetByUserIdAsync(Guid userId);
+        Task<List<Borrow>> GetByUserIdAsync(Guid userId, int pageNumber, int pageSize);
         Task<List<Borrow>> GetByBookIdAsync(Guid bookId);
         Task<List<Borrow>> GetLimitedAsync(int limit);
 

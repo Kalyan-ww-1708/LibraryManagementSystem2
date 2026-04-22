@@ -13,9 +13,11 @@ namespace LibraryManagementSystem.Services
     public class BorrowService : IBorrowService
     {
         private readonly IBorrowRepository _borrowRepository;
+        
         public BorrowService(IBorrowRepository borrowRepository)
         {
             _borrowRepository = borrowRepository;
+ 
         }
         public async Task<List<BorrowDetailsDto>> GetBorrowList()
         {
@@ -53,10 +55,10 @@ namespace LibraryManagementSystem.Services
             var borrow = await _borrowRepository.GetByIdAsync(borrowId);
             return borrow;
         }
-        public async Task<List<BorrowDetailsDto>> GetBorrowListByUserId(Guid userId)
+        public async Task<List<BorrowDetailsDto>> GetBorrowListByUserId(Guid userId, int pageNumber, int pageSize)
         {
 
-            var borrowList = await _borrowRepository.GetByUserIdAsync(userId);
+            var borrowList = await _borrowRepository.GetByUserIdAsync(userId,pageNumber,pageSize);
             return borrowList.Select(b => new BorrowDetailsDto
             {
                 BorrowId = b.BorrowId,
@@ -138,12 +140,14 @@ namespace LibraryManagementSystem.Services
                 throw new InValidException("Only pending requests can be approved");
             if (borrow.Book?.AvailableCopies <= 0)
                 throw new InValidException("No copies available");
-            borrow.Status = "Approved";
+            var status = borrow.Status = "Approved";
             borrow.StatusUpdatedAt = DateTime.UtcNow;
             borrow.Book!.AvailableCopies--;
+        
             await _borrowRepository.SaveChangesAsync();
             return borrow.Status;
         }
+       
         public async Task<List<BorrowDetailsDto>> BorrowListForApprovals()
         {
             var borrowList = await _borrowRepository.GetApprovalBorrowsAsync();

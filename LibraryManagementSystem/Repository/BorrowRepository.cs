@@ -17,7 +17,7 @@ namespace LibraryManagementSystem.Repository
         }
         public async Task<List<Borrow>> GetAllAsync()
         {
-            return await _dbContext.Borrows.Include(b => b.Book).Include(b => b.User).ToListAsync();
+            return await _dbContext.Borrows.Include(b => b.Book).Include(b => b.User).OrderByDescending(b => b.RequestAt).ToListAsync();
         }
         public async Task<List<Borrow>> GetLimitedAsync(int limit)
         {
@@ -48,9 +48,10 @@ namespace LibraryManagementSystem.Repository
         {
             await _dbContext.SaveChangesAsync();
         }
-        public async Task<List<Borrow>> GetByUserIdAsync(Guid userId)
+        public async Task<List<Borrow>> GetByUserIdAsync(Guid userId, int pageNumber, int pageSize)
         {
-            return await _dbContext.Borrows.Where(b => b.UserId == userId).Include(b => b.Book).Include(b => b.User).ToListAsync();
+            return await _dbContext.Borrows.Where(b => b.UserId == userId).OrderByDescending(b => b.RequestAt)
+        .Include(b => b.Book).Include(b => b.User).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         public async Task<List<Borrow>> GetByBookIdAsync(Guid bookId)
@@ -111,7 +112,7 @@ namespace LibraryManagementSystem.Repository
 
         public async Task<List<Borrow>> GetApprovalBorrowsAsync()
         {
-            return await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).ToListAsync();
+            return await _dbContext.Borrows.Where(b => b.Status == "Pending").Include(b => b.Book).Include(b => b.User).OrderByDescending(b => b.RequestAt).ToListAsync();
         }
         public async Task<List<Borrow>> GetReturnBorrowsAsync(){ 
             return await _dbContext.Borrows.Where(b=>b.Status == "Return Raised").Include(b => b.Book).Include(b => b.User).ToListAsync();

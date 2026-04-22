@@ -26,7 +26,8 @@ namespace LibraryManagementSystem.Controllers
         
         //GET https://localhost:7033/api/book
         [HttpGet]
-        public async Task<IActionResult> GetAllBooks(){
+        public async Task<IActionResult> GetAllBooks()
+        {
             try{
                 var books = await _bookService.GetAllBooks();
                return Ok(books);

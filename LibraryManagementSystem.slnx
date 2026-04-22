@@ -1,4 +1,2 @@
 <Solution>
-  <Project Path="LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj" />
-  <Project Path="LibraryManagementSystem/LibraryManagementSystem.csproj" />
 </Solution>

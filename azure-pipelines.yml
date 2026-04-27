@@ -1,6 +1,6 @@
 
 trigger:
-- prod   # Yes, this is your branch
+- production   # Yes, this is your branch
 
 pool:
   vmImage: ubuntu-latest

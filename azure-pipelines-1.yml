@@ -1,0 +1,47 @@
+trigger:
+  branches:
+    include:
+    - prod
+variables:
+- name: buildConfiguration
+  value: 'Release'
+- name: solution
+  value: 'LibraryManagementSystem.slnx'
+- name: projectPath
+  value: 'LibraryManagementSystem/LibraryManagementSystem.csproj'
+- name: appName
+  value: 'LibraryManagement-backend'
+stages:
+- stage: __default
+  jobs:
+  - job: Job
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET SDK'
+      inputs:
+        packageType: 'sdk'
+        version: '10.0.x'
+    - task: CmdLine@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        script: dotnet restore $(solution)
+    - task: CmdLine@2
+      displayName: 'Build Solution'
+      inputs:
+        script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore
+    - task: CmdLine@2
+      displayName: 'Run Unit Tests'
+      inputs:
+        script: dotnet test LibraryManagementSystem.UnitTests/LibraryManagementSystem.UnitTests.csproj --configuration $(buildConfiguration) --no-build --verbosity normal
+    - task: CmdLine@2
+      displayName: 'Publish Project'
+      inputs:
+        script: dotnet publish $(projectPath) --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+    - task: AzureWebApp@1
+      displayName: 'Deploy to Azure App Service'
+      inputs:
+        azureSubscription: 'backend_server_connection'
+        appName: '$(appName)'
+        package: '$(Build.ArtifactStagingDirectory)'

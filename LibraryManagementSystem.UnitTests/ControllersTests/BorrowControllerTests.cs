@@ -69,11 +69,11 @@ namespace LibraryManagementSystem.UnitTests.ControllerTest
         [Fact]
         public async Task GetBorrowListByUserId_ShouldReturnOk()
         {
-            _mockService.Setup(s => s.GetBorrowListByUserId(It.IsAny<Guid>()))
+            _mockService.Setup(s => s.GetBorrowListByUserId(It.IsAny<Guid>(),1,10))
                 .ReturnsAsync(new List<BorrowDetailsDto> { new BorrowDetailsDto() });
 
 
-            var result = await _controller.GetBorrowListByUserId(Guid.NewGuid());
+            var result = await _controller.GetBorrowListByUserId(Guid.NewGuid(),1,10);
 
             result.Should().BeOfType<OkObjectResult>();
         }

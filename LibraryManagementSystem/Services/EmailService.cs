@@ -14,7 +14,14 @@ namespace LibraryManagementSystem.Services
             message.Subject = "Otp Verification";
             message.Body = new TextPart("plain")
             {
-                Text = $"Your OTP is: {otp}"
+                Text = $@"Hello,
+                            Your One-Time Password (OTP) is: {otp}
+                            This OTP is valid for the next 5 minutes.
+                            Please do not share it with anyone for security reasons.
+                            If you did not request this, please ignore this email.
+
+                            Regards,
+                            Library Management System Team"
             };
 
             var smtp = new SmtpClient();

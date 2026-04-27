@@ -1,2 +1,0 @@
- // "DefaultConnection": "server = (localdb)\\MSSQLLocalDB; Database=LibraryDb;Trusted_connection = True; TrustServerCertificate=True"
- This is for Local ssMs

@@ -55,7 +55,7 @@
 
 
 trigger:
-- v3.0   # Yes, this is your branch
+- prod
 
 pool:
   vmImage: ubuntu-latest
